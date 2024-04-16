@@ -1,6 +1,6 @@
 export class WebResponse<T>{
     data?: T;
-    message?: string;
+    message?: string | number;
     code?: number;
 
 }
