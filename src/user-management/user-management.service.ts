@@ -1,15 +1,11 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
 import { UserResponse } from 'src/model/UserManagement.model';
 
 @Injectable()
 export class UserManagementService {
-  constructor(
-    @Inject(WINSTON_MODULE_NEST_PROVIDER) private logger: Logger,
-    private prismaService: PrismaService,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
   async getAllUsers(
     page: number,
