@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { WebResponse } from 'src/model/web.model';
 import { RegisterUserRequest, UserResponse } from 'src/model/user.model';
 
-@Controller('/admin')
+@Controller()
 export class UserController {
     constructor(
         private userService: UserService,
