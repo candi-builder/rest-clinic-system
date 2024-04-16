@@ -36,7 +36,7 @@ export class PrismaService
 
   onModuleInit() {
     this.$on('info', (e) => {
-      this.logger.info(e);
+      this.logger.debug(e);
     });
     this.$on('warn', (e) => {
       this.logger.warn(e);
@@ -45,7 +45,7 @@ export class PrismaService
       this.logger.error(e);
     });
     this.$on('query', (e) => {
-      this.logger.info(e);
+      this.logger.debug(e);
     });
   }
 }
