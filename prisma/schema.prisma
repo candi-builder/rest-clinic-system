@@ -12,3 +12,25 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  uuid String @id
+  username String @unique
+  password String
+  roles Role @default(SUPERADMIN)
+  full_name String
+}
+
+enum Role {
+  SUPERADMIN
+  RESEPSIONIS
+  DOKTER
+  APOTEKER
+}
+
+enum Status {
+  MENUNGGU
+  PEMERIKSAAN
+  SELESAI
+}
+
