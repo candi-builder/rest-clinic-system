@@ -21,7 +21,9 @@ model User {
   full_name       String
   PengambilanObat PengambilanObat[]
   Antrian         Antrian[]
-  TUser           TUser[]
+  TPoli           TPoli[]
+
+  @@map("user")
 }
 
 model Poli {
@@ -29,7 +31,9 @@ model Poli {
   poli_name String
   Pasien    Pasien[]
   Antrian   Antrian[]
-  TUser     TUser[]
+  TPoli     TPoli[]
+  @@map("poli")
+
 }
 
 model Pasien {
@@ -42,6 +46,8 @@ model Pasien {
   poli                Poli     @relation(fields: [poli_id], references: [poli_id])
   poli_id             BigInt
   Resep               Resep[]
+  @@map("pasien")
+
 }
 
 model Resep {
@@ -52,6 +58,8 @@ model Resep {
   keterangen_Resep String
   hasil_diagnosa   String
   PengambilanObat  PengambilanObat[]
+  @@map("resep")
+
 }
 
 model PengambilanObat {
@@ -60,6 +68,8 @@ model PengambilanObat {
   resep_id BigInt
   user     User   @relation(fields: [user_id], references: [uuid])
   user_id  String
+  @@map("pengambilan_obat")
+
 }
 
 model Antrian {
@@ -69,15 +79,19 @@ model Antrian {
   user    User   @relation(fields: [user_id], references: [uuid])
   user_id String
   statu   Status
+  @@map("antrian")
+
 }
 
-model TUser {
+model TPoli {
   id   BigInt @id @default(autoincrement())
   poli Poli   @relation(fields: [poli_id], references: [poli_id])
   poli_id BigInt
   user    User   @relation(fields: [user_id], references: [uuid])
   user_id String
   statu   Status
+  @@map("t_poli")
+
 }
 
 enum Role {
