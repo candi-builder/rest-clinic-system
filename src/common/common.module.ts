@@ -1,6 +1,9 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { WinstonModule } from 'nest-winston';
+import {
+  utilities as nestWinstonModuleUtilities,
+  WinstonModule,
+} from 'nest-winston';
 import * as winston from 'winston';
 import { PrismaService } from './prisma.service';
 import { ValidationService } from './validation.service';
@@ -9,7 +12,18 @@ import { ValidationService } from './validation.service';
   imports: [
     WinstonModule.forRoot({
       format: winston.format.json(),
-      transports: [new winston.transports.Console()],
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.ms(),
+            nestWinstonModuleUtilities.format.nestLike('MyApp', {
+              colors: true,
+              prettyPrint: true,
+            }),
+          ),
+        }),
+      ],
     }),
     ConfigModule.forRoot({
       isGlobal: true,
