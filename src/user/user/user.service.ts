@@ -34,8 +34,9 @@ export class UserService {
       throw new HttpException('Username already exists', 400);
     }
 
+    const defaultPassword = 'isvill15001';
     registerUserRequest.password = await bcrypt.hash(
-      registerUserRequest.password,
+      defaultPassword,
       10,
     );
 
