@@ -10,8 +10,13 @@ export class RegisterUserRequest {
 
 export class UserResponse {
     uuid: string;
+    username?: string;
+    password?: string;
+    role: Role;
+    full_name?: string;
+}
+
+export class LoginRequest{
     username: string;
     password: string;
-    role: Role;
-    full_name: string;
 }
