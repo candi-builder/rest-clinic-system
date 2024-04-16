@@ -14,11 +14,70 @@ datasource db {
 }
 
 model User {
-  uuid String @id
-  username String @unique
-  password String
-  roles Role @default(SUPERADMIN)
-  full_name String
+  uuid            String            @id
+  username        String            @unique
+  password        String
+  roles           Role              @default(SUPERADMIN)
+  full_name       String
+  PengambilanObat PengambilanObat[]
+  Antrian         Antrian[]
+  TUser           TUser[]
+}
+
+model Poli {
+  poli_id   BigInt    @id @default(autoincrement())
+  poli_name String
+  Pasien    Pasien[]
+  Antrian   Antrian[]
+  TUser     TUser[]
+}
+
+model Pasien {
+  pasien_id           BigInt   @id @default(autoincrement())
+  nomor_bpjs          String
+  nama_passien        String
+  tanggal_lahir       DateTime
+  alamat              String
+  faskes_tingkat_satu String
+  poli                Poli     @relation(fields: [poli_id], references: [poli_id])
+  poli_id             BigInt
+  Resep               Resep[]
+}
+
+model Resep {
+  resep_id         BigInt            @id @default(autoincrement())
+  pasien           Pasien            @relation(fields: [pasien_id], references: [pasien_id])
+  pasien_id        BigInt
+  tanggal_resep    DateTime
+  keterangen_Resep String
+  hasil_diagnosa   String
+  PengambilanObat  PengambilanObat[]
+}
+
+model PengambilanObat {
+  id       Int    @id @default(autoincrement())
+  resep    Resep  @relation(fields: [resep_id], references: [resep_id])
+  resep_id BigInt
+  user     User   @relation(fields: [user_id], references: [uuid])
+  user_id  String
+}
+
+model Antrian {
+  id      Int    @id @default(autoincrement())
+  poli    Poli   @relation(fields: [poli_id], references: [poli_id])
+  poli_id BigInt
+  user    User   @relation(fields: [user_id], references: [uuid])
+  user_id String
+  statu   Status
+}
+
+model TUser {
+  id   BigInt @id @default(autoincrement())
+  poli Poli   @relation(fields: [poli_id], references: [poli_id])
+  poli_id BigInt
+  user    User   @relation(fields: [user_id], references: [uuid])
+  user_id String
+  statu   Status
 }
 
 enum Role {
@@ -33,4 +92,3 @@ enum Status {
   PEMERIKSAAN
   SELESAI
 }
-
