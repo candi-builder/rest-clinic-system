@@ -7,7 +7,7 @@ import { UserService } from 'src/user/user/user.service';
 import { RegisterUserRequest, UserResponse } from 'src/model/user.model';
 import { WebResponse } from 'src/model/web.model';
 import { Role } from '@prisma/client';
-import { PrismaService } from 'src/common/prisma/prisma.service';
+import { PrismaService } from 'src/common/prisma.service';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;

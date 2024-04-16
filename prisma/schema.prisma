@@ -20,9 +20,7 @@ model User {
   roles           Role              @default(SUPERADMIN)
   full_name       String
   PengambilanObat PengambilanObat[]
-  Antrian         Antrian[]
   TPoli           TPoli[]
-
   @@map("user")
 }
 
@@ -30,10 +28,9 @@ model Poli {
   poli_id   BigInt    @id @default(autoincrement())
   poli_name String
   Pasien    Pasien[]
-  Antrian   Antrian[]
   TPoli     TPoli[]
-  @@map("poli")
 
+  @@map("poli")
 }
 
 model Pasien {
@@ -46,8 +43,8 @@ model Pasien {
   poli                Poli     @relation(fields: [poli_id], references: [poli_id])
   poli_id             BigInt
   Resep               Resep[]
-  @@map("pasien")
 
+  @@map("pasien")
 }
 
 model Resep {
@@ -58,8 +55,8 @@ model Resep {
   keterangen_Resep String
   hasil_diagnosa   String
   PengambilanObat  PengambilanObat[]
-  @@map("resep")
 
+  @@map("resep")
 }
 
 model PengambilanObat {
@@ -68,30 +65,28 @@ model PengambilanObat {
   resep_id BigInt
   user     User   @relation(fields: [user_id], references: [uuid])
   user_id  String
-  @@map("pengambilan_obat")
 
+  @@map("pengambilan_obat")
 }
 
 model Antrian {
   id      Int    @id @default(autoincrement())
+  poli    TPoli  @relation(fields: [poli_id], references: [id])
+  poli_id BigInt
+  status  Status
+  @@map("antrian")
+}
+
+model TPoli {
+  id      BigInt @id @default(autoincrement())
   poli    Poli   @relation(fields: [poli_id], references: [poli_id])
   poli_id BigInt
   user    User   @relation(fields: [user_id], references: [uuid])
   user_id String
-  statu   Status
-  @@map("antrian")
+  status  Status
+  Antrian Antrian[]
 
-}
-
-model TPoli {
-  id   BigInt @id @default(autoincrement())
-  poli Poli   @relation(fields: [poli_id], references: [poli_id])
-  poli_id BigInt
-  user    User   @relation(fields: [user_id], references: [uuid])
-  user_id String
-  statu   Status
   @@map("t_poli")
-
 }
 
 enum Role {
