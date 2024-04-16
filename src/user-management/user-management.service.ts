@@ -46,4 +46,25 @@ export class UserManagementService {
       message: 'success',
     };
   }
+
+  async getDetailUser(uuid: string): Promise<BaseResponse<UserResponse>> {
+    const users = await this.prismaService.user.findUnique({
+      where: {
+        uuid: uuid,
+      },
+    });
+
+    const userResponses: UserResponse = {
+      uuid: users.uuid,
+      username: users.username,
+      role: users.roles,
+      fullname: users.full_name,
+    };
+
+    return {
+      data: userResponses,
+      status_code: 200,
+      message: 'success',
+    };
+  }
 }
