@@ -5,6 +5,7 @@ import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { PassienValidation } from './passien.validation';
 import { ValidationService } from 'src/common/validation.service';
 import { WebResponse } from 'src/model/web.model';
+import { BaseResponse } from 'src/model/BaseResponse.model';
 
 @Injectable()
 export class PassienService {
@@ -14,7 +15,7 @@ export class PassienService {
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
       ) {}
 
-      async register(request: PassienRequest): Promise<WebResponse<PassienResponse>> {
+      async register(request: PassienRequest): Promise<BaseResponse<PassienResponse>> {
         this.logger.debug(`Registering passien ${JSON.stringify(request)}`);
         const registerPassienRequest: PassienRequest =
           this.validationService.validate(PassienValidation.REGISTER_PASSIEN, request);
@@ -52,9 +53,11 @@ export class PassienService {
           });
       
           return {
-            
-           
+            status_code: 200,
+            message: 'Passien berhasil didaftarkan',
           };
+
+          
         } catch (error) {
           this.logger.warn(error);
           throw Error(error);
