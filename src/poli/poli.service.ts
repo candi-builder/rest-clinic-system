@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
-import { BaseResponse } from 'src/model/BaseResponse.model';
+import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
+import { PoliResponse } from 'src/model/Poli.model';
 
 @Injectable()
 export class PoliService {
@@ -94,6 +94,41 @@ export class PoliService {
     return {
       status_code: 200,
       message: 'Berhasil menambah member',
+    };
+  }
+
+  async getListPoli(
+    page: number,
+    size: number,
+  ): Promise<BaseResponse<PoliResponse[]>> {
+    const totalCount = await this.prismaService.poli.count();
+    const totalPages = Math.ceil(totalCount / size);
+    const polis = await this.prismaService.poli.findMany({
+      skip: (page - 1) * size,
+      take: size,
+      select: {
+        poli_id: true,
+        poli_name: true,
+      },
+    });
+
+    const PoliResponse: PoliResponse[] = polis.map((user) => ({
+      id: user.poli_id.toString(),
+      poli_name: user.poli_name,
+    }));
+
+    const paginationData: PaginationData = {
+      page,
+      size,
+      total_page: totalPages,
+      total_data: totalCount,
+    };
+
+    return {
+      data: PoliResponse,
+      pagination: paginationData,
+      status_code: 200,
+      message: 'success',
     };
   }
 }

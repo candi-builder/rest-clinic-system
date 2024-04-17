@@ -1,5 +1,5 @@
 export class PoliResponse {
-  id: bigint;
+  id: string;
   poli_name: string;
   doctor?: string;
 }

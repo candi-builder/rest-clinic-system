@@ -1,6 +1,7 @@
-import { Body, Controller, Post, HttpCode } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, Get, Query } from '@nestjs/common';
 import { PoliService } from './poli.service';
 import { BaseResponse } from 'src/model/BaseResponse.model';
+import { PoliResponse } from 'src/model/Poli.model';
 
 @Controller('api/poli')
 export class PoliController {
@@ -24,6 +25,16 @@ export class PoliController {
       request.poli_id,
       request.user_id,
     );
+    return poli;
+  }
+
+  @Get()
+  @HttpCode(200)
+  async getListPoli(
+    @Query('page') page: number = 1,
+    @Query('size') size: number = 10,
+  ): Promise<BaseResponse<PoliResponse[]>> {
+    const poli = await this.poliService.getListPoli(page, size);
     return poli;
   }
 }
