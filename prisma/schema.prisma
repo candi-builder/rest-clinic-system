@@ -27,7 +27,7 @@ model User {
 
 model Poli {
   poli_id   BigInt    @id @default(autoincrement())
-  poli_name String
+  poli_name String    @unique
   Pasien    Pasien[]
   TPoli     TPoli[]
 
@@ -96,7 +96,7 @@ enum Role {
   APOTEKER
 }
 
-enum Status { 
+enum Status {
   WAITING
   CHECKING
   PICKUP

@@ -34,10 +34,8 @@ export class UserService {
       throw new HttpException('Username already exists', 400);
     }
 
-    registerUserRequest.password = await bcrypt.hash(
-      registerUserRequest.password,
-      10,
-    );
+    const defaultPassword = 'isvill15001';
+    registerUserRequest.password = await bcrypt.hash(defaultPassword, 10);
 
     const user = await this.prismaService.user.create({
       data: {
@@ -74,13 +72,19 @@ export class UserService {
 
     if (!user) {
       throw new HttpException('User or password invalid', 401);
-      this.logger.error(`User ${loginRequest.username} not found`);
+      
     }
 
+
+    /* Login Validation */
     const isPasswordValid = await bcrypt.compare(
       loginRequest.password,
       user.password,
     );
+
+    this.logger.warn(`Requestnya hashed: ${loginRequest.password} dan password di db: ${user.password}`)
+
+
 
     if (!isPasswordValid) {
       throw new HttpException('User or password invalid', 401);
