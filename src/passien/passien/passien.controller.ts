@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common';
 import { PassienService } from './passien.service';
 import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { WebResponse } from 'src/model/web.model';
@@ -20,17 +20,9 @@ export class PassienController {
                 message: StatusPassien.SUCCESS_REGISTER_PASSIEN,
             };
 
-        }catch (error){
-            return{
-                status_code: HttpStatus.BAD_REQUEST,
-                message: error.issues ? error.issues[0] : StatusPassien.EXISTING_BPJS_NUMBER,
-
-                
-                
-                
-            };
+        }catch (error) {
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
         }
-        
 
        
     }

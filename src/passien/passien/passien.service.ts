@@ -26,9 +26,21 @@ export class PassienService {
               nomor_bpjs: registerPassienRequest.nomor_bpjs,
             },
           });
-      
+
+          const checkPoli = await this.prismaService.poli.findFirst({
+
+            where: {
+              poli_id: registerPassienRequest.poli_id,
+            },
+          });
+
+          if (!checkPoli) {
+            
+            throw new HttpException('Poli tidak ditemukan', 400);
+          }
+
           if (existingPassien) {
-            // Pasien dengan nomor BPJS yang sama sudah ada, lakukan tindakan yang sesuai
+           
             throw new HttpException('Nomor BPJS sudah terdaftar', 400);
           }
       
