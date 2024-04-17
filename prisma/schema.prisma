@@ -26,7 +26,7 @@ model User {
 
 model Poli {
   poli_id   BigInt    @id @default(autoincrement())
-  poli_name String
+  poli_name String    @unique
   Pasien    Pasien[]
   TPoli     TPoli[]
 
@@ -83,7 +83,6 @@ model TPoli {
   poli_id BigInt
   user    User   @relation(fields: [user_id], references: [uuid])
   user_id String
-  status  Status
   Antrian Antrian[]
 
   @@map("t_poli")
@@ -97,7 +96,8 @@ enum Role {
 }
 
 enum Status {
-  MENUNGGU
-  PEMERIKSAAN
-  SELESAI
+  WAITING
+  CHECKING
+  PICKUP
+  DONE
 }

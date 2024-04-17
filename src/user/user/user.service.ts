@@ -35,10 +35,7 @@ export class UserService {
     }
 
     const defaultPassword = 'isvill15001';
-    registerUserRequest.password = await bcrypt.hash(
-      defaultPassword,
-      10,
-    );
+    registerUserRequest.password = await bcrypt.hash(defaultPassword, 10);
 
     const user = await this.prismaService.user.create({
       data: {
