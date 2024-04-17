@@ -15,12 +15,23 @@ export class UserController {
   async registerUser(
     @Body() request: RegisterUserRequest,
   ): Promise<WebResponse<UserResponse>> {
-    const result = await this.userService.register(request);
 
-    return {
-      data: result,
-    };
+    try{
+      const result = await this.userService.register(request);
+
+      return {
+        message: `User registered as ${result.role}`
+      };
+    }
+    catch(error){
+      return {
+        
+        message: error.issues[0]
+      };
+    }
   }
+    
+   
 
   @Post('api/login')
   async login(
