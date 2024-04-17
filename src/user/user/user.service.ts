@@ -71,8 +71,8 @@ export class UserService {
     });
 
     if (!user) {
-      this.logger.error(`User ${loginRequest.username} not found`);
       throw new HttpException('User or password invalid', 401);
+      this.logger.error(`User ${loginRequest.username} not found`);
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -81,10 +81,8 @@ export class UserService {
     );
 
     if (!isPasswordValid) {
-      this.logger.error(
-        `Password for user ${loginRequest.username} is invalid`,
-      );
       throw new HttpException('User or password invalid', 401);
+      // this.logger.error(`Password for user ${loginRequest.username} is invalid`)
     }
 
     return {

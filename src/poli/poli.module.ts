@@ -4,6 +4,6 @@ import { PoliController } from './poli.controller';
 
 @Module({
   providers: [PoliService],
-  controllers: [PoliController]
+  controllers: [PoliController],
 })
 export class PoliModule {}

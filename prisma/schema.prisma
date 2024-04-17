@@ -83,7 +83,6 @@ model TPoli {
   poli_id BigInt
   user    User   @relation(fields: [user_id], references: [uuid])
   user_id String
-  status  Status
   Antrian Antrian[]
 
   @@map("t_poli")

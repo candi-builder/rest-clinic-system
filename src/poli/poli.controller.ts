@@ -14,4 +14,16 @@ export class PoliController {
     const poli = await this.poliService.addPoli(request.name);
     return poli;
   }
+
+  @Post('/add-member')
+  @HttpCode(200)
+  async addPoliMember(
+    @Body() request: { poli_id: bigint; user_id: string },
+  ): Promise<BaseResponse<string>> {
+    const poli = await this.poliService.addPoliMember(
+      request.poli_id,
+      request.user_id,
+    );
+    return poli;
+  }
 }
