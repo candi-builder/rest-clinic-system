@@ -43,4 +43,24 @@ export class UserController {
       message: 'Login Berhasil!',
     };
   }
+
+  @Post('/login')
+    async login(@Body() request: LoginRequest): Promise<WebResponse<UserResponse>> {
+
+      try{
+        const result = await this.userService.login(request);
+        return {
+          data: result,
+          message: "Login Berhasil!",
+          };
+
+      }catch
+      {
+        return{
+          status_code: HttpStatus.BAD_REQUEST,
+          message: "Login Gagal!",
+        };
+      }
+        
+    }
 }

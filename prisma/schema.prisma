@@ -21,6 +21,7 @@ model User {
   full_name       String
   PengambilanObat PengambilanObat[]
   TPoli           TPoli[]
+
   @@map("user")
 }
 
