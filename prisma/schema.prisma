@@ -21,6 +21,7 @@ model User {
   full_name       String
   PengambilanObat PengambilanObat[]
   TPoli           TPoli[]
+
   @@map("user")
 }
 
@@ -83,7 +84,6 @@ model TPoli {
   poli_id BigInt
   user    User   @relation(fields: [user_id], references: [uuid])
   user_id String
-  status  Status
   Antrian Antrian[]
 
   @@map("t_poli")
@@ -96,8 +96,9 @@ enum Role {
   APOTEKER
 }
 
-enum Status {
-  MENUNGGU
-  PEMERIKSAAN
-  SELESAI
+enum Status { 
+  WAITING
+  CHECKING
+  PICKUP
+  DONE
 }
