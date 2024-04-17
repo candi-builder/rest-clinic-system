@@ -15,5 +15,6 @@ static convertStringToNumber(value: string): number {
 
 export enum StatusPassien{
   EXISTING_BPJS_NUMBER = "Pasien sudah terdaftar",
+  SUCCESS_REGISTER_PASSIEN = "Pasien berhasil terdaftar",
 }
 

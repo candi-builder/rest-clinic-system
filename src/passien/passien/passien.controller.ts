@@ -17,7 +17,7 @@ export class PassienController {
             await this.passienService.register(request);
             return {
                 status_code: HttpStatus.OK,
-                message: "Pasien berhasil ditambahkan",
+                message: StatusPassien.SUCCESS_REGISTER_PASSIEN,
             };
 
         }catch (error){

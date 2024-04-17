@@ -1,10 +1,9 @@
-import { Inject, Injectable, Logger, ValidationError } from '@nestjs/common';
+import { HttpException, Inject, Injectable, Logger, ValidationError } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { PassienValidation } from './passien.validation';
 import { ValidationService } from 'src/common/validation.service';
-import { Utils } from 'src/utils/utils';
 import { WebResponse } from 'src/model/web.model';
 
 @Injectable()
@@ -30,26 +29,24 @@ export class PassienService {
       
           if (existingPassien) {
             // Pasien dengan nomor BPJS yang sama sudah ada, lakukan tindakan yang sesuai
-            throw new Error(`Pasien dengan nomor BPJS ${registerPassienRequest.nomor_bpjs} sudah terdaftar.`);
+            throw new HttpException('Nomor BPJS sudah terdaftar', 400);
           }
       
           const passien = await this.prismaService.pasien.create({
             data: {
-              nomor_bpjs: registerPassienRequest.nomor_bpjs,
-              nama_passien: registerPassienRequest.nama_passien,
+              ...registerPassienRequest,
               tanggal_lahir: new Date(registerPassienRequest.tanggal_lahir),
-              alamat: registerPassienRequest.alamat,
-              faskes_tingkat_satu: registerPassienRequest.faskes_tingkat_satu,
-              poli_id: registerPassienRequest.poli_id,
             },
           });
       
           return {
+            
            
           };
         } catch (error) {
-          this.logger.warn(`Error registering passien ${JSON.stringify(error)}`);
-          throw error;
+          this.logger.warn(error);
+          throw Error(error);
+         
         }
       }
 
