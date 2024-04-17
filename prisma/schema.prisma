@@ -97,7 +97,8 @@ enum Role {
 }
 
 enum Status {
-  MENUNGGU
-  PEMERIKSAAN
-  SELESAI
+  WAITING
+  CHECKING
+  PICKUP
+  DONE
 }

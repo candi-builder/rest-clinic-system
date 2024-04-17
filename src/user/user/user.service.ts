@@ -35,10 +35,7 @@ export class UserService {
     }
 
     const defaultPassword = 'isvill15001';
-    registerUserRequest.password = await bcrypt.hash(
-      defaultPassword,
-      10,
-    );
+    registerUserRequest.password = await bcrypt.hash(defaultPassword, 10);
 
     const user = await this.prismaService.user.create({
       data: {
@@ -74,8 +71,8 @@ export class UserService {
     });
 
     if (!user) {
-      throw new HttpException('User or password invalid', 401);
       this.logger.error(`User ${loginRequest.username} not found`);
+      throw new HttpException('User or password invalid', 401);
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -84,8 +81,10 @@ export class UserService {
     );
 
     if (!isPasswordValid) {
+      this.logger.error(
+        `Password for user ${loginRequest.username} is invalid`,
+      );
       throw new HttpException('User or password invalid', 401);
-      // this.logger.error(`Password for user ${loginRequest.username} is invalid`)
     }
 
     return {
