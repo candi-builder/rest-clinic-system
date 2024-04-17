@@ -131,4 +131,61 @@ export class PoliService {
       message: 'success',
     };
   }
+
+  async getListMember(
+    page: number,
+    size: number,
+    poli_id: bigint,
+  ): Promise<BaseResponse<PoliResponse[]>> {
+    const totalCount = await this.prismaService.tPoli.count({
+      where: {
+        poli: {
+          poli_id: poli_id,
+        },
+      },
+    });
+    const totalPages = Math.ceil(totalCount / size);
+
+    const result = await this.prismaService.tPoli.findMany({
+      skip: (page - 1) * size,
+      take: size,
+      where: {
+        poli: {
+          poli_id: poli_id,
+        },
+      },
+      select: {
+        id: true,
+        user: {
+          select: {
+            username: true,
+          },
+        },
+        poli: {
+          select: {
+            poli_name: true,
+          },
+        },
+      },
+    });
+    const PoliResponse: PoliResponse[] = result.map((poli) => ({
+      id: poli.id.toString(),
+      poli_name: poli.poli.poli_name,
+      doctor: poli.user.username,
+    }));
+
+    const paginationData: PaginationData = {
+      page,
+      size,
+      total_page: totalPages,
+      total_data: totalCount,
+    };
+
+    return {
+      data: PoliResponse,
+      pagination: paginationData,
+      status_code: 200,
+      message: 'success',
+    };
+  }
 }
