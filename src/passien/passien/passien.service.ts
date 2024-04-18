@@ -53,6 +53,7 @@ export class PassienService {
           });
       
           return {
+            
             status_code: 200,
             message: 'Passien berhasil didaftarkan',
           };
@@ -66,6 +67,39 @@ export class PassienService {
       }
 
 
+      async getPassienDetail(id: number): Promise<BaseResponse<PassienResponse>> {
+        const pasien = await this.prismaService.pasien.findUnique({
+          where: {
+            pasien_id: id, // Pastikan tipe data id sesuai
+          },
+        });
+      
+        if (!pasien) {
+          throw new HttpException('Pasien tidak ditemukan', 404);
+        }
+      
+        return {
+          data: {
+            passien_id: Number(pasien.pasien_id),
+            nomor_bpjs: pasien.nomor_bpjs,
+            nama_passien: pasien.nama_passien,
+            tanggal_lahir: pasien.tanggal_lahir,
+            alamat: pasien.alamat,
+            faskes_tingkat_satu: pasien.faskes_tingkat_satu,
+            poli_id: Number(pasien.poli_id),
+          },
+          status_code: 200,
+          message: 'Success get pasien by id',
+        };
+      }
 
 
-}
+
+        
+
+      
+    
+
+
+
+    }
