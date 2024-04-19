@@ -15,6 +15,7 @@ CREATE TABLE `poli` (
     `poli_id` BIGINT NOT NULL AUTO_INCREMENT,
     `poli_name` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `poli_poli_name_key`(`poli_name`),
     PRIMARY KEY (`poli_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -55,8 +56,8 @@ CREATE TABLE `pengambilan_obat` (
 CREATE TABLE `antrian` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `poli_id` BIGINT NOT NULL,
-    `user_id` VARCHAR(191) NOT NULL,
-    `statu` ENUM('MENUNGGU', 'PEMERIKSAAN', 'SELESAI') NOT NULL,
+    `passien_id` BIGINT NOT NULL,
+    `status` ENUM('WAITING', 'CHECKING', 'PICKUP', 'DONE') NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -66,7 +67,6 @@ CREATE TABLE `t_poli` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `poli_id` BIGINT NOT NULL,
     `user_id` VARCHAR(191) NOT NULL,
-    `statu` ENUM('MENUNGGU', 'PEMERIKSAAN', 'SELESAI') NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -84,10 +84,10 @@ ALTER TABLE `pengambilan_obat` ADD CONSTRAINT `pengambilan_obat_resep_id_fkey` F
 ALTER TABLE `pengambilan_obat` ADD CONSTRAINT `pengambilan_obat_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`uuid`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `antrian` ADD CONSTRAINT `antrian_poli_id_fkey` FOREIGN KEY (`poli_id`) REFERENCES `poli`(`poli_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `antrian` ADD CONSTRAINT `antrian_poli_id_fkey` FOREIGN KEY (`poli_id`) REFERENCES `t_poli`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `antrian` ADD CONSTRAINT `antrian_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`uuid`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `antrian` ADD CONSTRAINT `antrian_passien_id_fkey` FOREIGN KEY (`passien_id`) REFERENCES `pasien`(`pasien_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `t_poli` ADD CONSTRAINT `t_poli_poli_id_fkey` FOREIGN KEY (`poli_id`) REFERENCES `poli`(`poli_id`) ON DELETE RESTRICT ON UPDATE CASCADE;

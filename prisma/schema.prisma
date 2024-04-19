@@ -26,8 +26,8 @@ model User {
 }
 
 model Poli {
-  poli_id   BigInt    @id @default(autoincrement())
-  poli_name String    @unique
+  poli_id   BigInt   @id @default(autoincrement())
+  poli_name String   @unique
   Pasien    Pasien[]
   TPoli     TPoli[]
 
@@ -35,15 +35,16 @@ model Poli {
 }
 
 model Pasien {
-  pasien_id           BigInt   @id @default(autoincrement())
+  pasien_id           BigInt    @id @default(autoincrement())
   nomor_bpjs          String
   nama_passien        String
   tanggal_lahir       DateTime
   alamat              String
   faskes_tingkat_satu String
-  poli                Poli     @relation(fields: [poli_id], references: [poli_id])
+  poli                Poli      @relation(fields: [poli_id], references: [poli_id])
   poli_id             BigInt
   Resep               Resep[]
+  Antrian             Antrian[]
 
   @@map("pasien")
 }
@@ -71,18 +72,21 @@ model PengambilanObat {
 }
 
 model Antrian {
-  id      Int    @id @default(autoincrement())
-  poli    TPoli  @relation(fields: [poli_id], references: [id])
-  poli_id BigInt
-  status  Status
+  id         Int    @id @default(autoincrement())
+  poli       TPoli  @relation(fields: [poli_id], references: [id])
+  poli_id    BigInt
+  passien    Pasien @relation(fields: [passien_id], references: [pasien_id])
+  passien_id BigInt
+  status     Status
+
   @@map("antrian")
 }
 
 model TPoli {
-  id      BigInt @id @default(autoincrement())
-  poli    Poli   @relation(fields: [poli_id], references: [poli_id])
+  id      BigInt    @id @default(autoincrement())
+  poli    Poli      @relation(fields: [poli_id], references: [poli_id])
   poli_id BigInt
-  user    User   @relation(fields: [user_id], references: [uuid])
+  user    User      @relation(fields: [user_id], references: [uuid])
   user_id String
   Antrian Antrian[]
 
