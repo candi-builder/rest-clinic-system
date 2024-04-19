@@ -12,7 +12,11 @@ import { PoliModule } from './poli/poli.module';
             UserModule, 
             UserManagementModule, 
             PoliModule,
-            PassienModule],
+            PassienModule,
+
+            
+          
+          ],
   controllers: [AppController],
   providers: [AppService],
 })

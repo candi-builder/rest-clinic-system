@@ -11,7 +11,7 @@ import {
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Post('api/register-user')
+  @Post('/register-user')
   async registerUser(
     @Body() request: RegisterUserRequest,
   ): Promise<WebResponse<UserResponse>> {

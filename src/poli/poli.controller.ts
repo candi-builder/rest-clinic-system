@@ -11,7 +11,7 @@ import { PoliService } from './poli.service';
 import { BaseResponse } from 'src/model/BaseResponse.model';
 import { PoliResponse } from 'src/model/Poli.model';
 
-@Controller('api/poli')
+@Controller('poli')
 export class PoliController {
   constructor(private readonly poliService: PoliService) {}
 

@@ -10,7 +10,7 @@ import { UserResponse } from 'src/model/UserManagement.model';
 import { BaseResponse } from 'src/model/BaseResponse.model';
 import { UserManagementService } from './user-management.service';
 
-@Controller('/api/users')
+@Controller('users')
 export class UserManagementController {
   constructor(private readonly userService: UserManagementService) {}
   @Get()
