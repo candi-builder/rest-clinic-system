@@ -72,6 +72,20 @@ export class PassienService {
           where: {
             pasien_id: id, // Pastikan tipe data id sesuai
           },
+          include:{
+            poli:{
+              include:{
+                TPoli:{
+                  include:{
+                    user: true
+                  }
+                }
+              }
+            },
+            Antrian: true
+            
+            
+          }
         });
       
         if (!pasien) {
@@ -87,6 +101,10 @@ export class PassienService {
             alamat: pasien.alamat,
             faskes_tingkat_satu: pasien.faskes_tingkat_satu,
             poli_id: Number(pasien.poli_id),
+            poli: pasien.poli.poli_name,
+            dokter: pasien.poli.TPoli[0].user.full_name,
+            status: pasien.Antrian[0].status
+            
           },
           status_code: 200,
           message: 'Success get pasien by id',

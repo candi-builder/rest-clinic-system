@@ -15,5 +15,9 @@ export class PassienResponse {
   tanggal_lahir: Date;
   alamat: string;
   faskes_tingkat_satu: string;
-  poli_id: number;
+  poli_id: number | bigint;
+
+  poli?: string
+  dokter?: any
+  status?: string
 }

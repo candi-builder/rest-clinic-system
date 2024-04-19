@@ -29,11 +29,11 @@ export class PassienController {
     }
 
 
-    @Get('/:passienId')
+    @Get(':passienId')
   async getPassienById(
-    @Param() params: { passienId: string },
+    @Param() params: { passienId: number },
   ): Promise<BaseResponse<PassienResponse>> {
-    const passien = await this.passienService.getPassienDetail(Number(params.passienId));
+    const passien = await this.passienService.getPassienDetail(params.passienId);
     return passien;
   }
 
