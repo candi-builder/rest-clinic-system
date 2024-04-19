@@ -11,7 +11,12 @@ import { PoliModule } from './poli/poli.module';
   imports: [CommonModule, 
             UserModule, 
             UserManagementModule, 
-            PoliModule],
+            PoliModule,
+            PassienModule,
+
+            
+          
+          ],
   controllers: [AppController],
   providers: [AppService],
 })

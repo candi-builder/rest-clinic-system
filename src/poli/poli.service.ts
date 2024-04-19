@@ -14,7 +14,7 @@ export class PoliService {
   async addPoli(name: string): Promise<BaseResponse<string>> {
     this.logger.debug(`add poli ${name}`);
 
-    const existingPoli = await this.prismaService.poli.findUnique({
+    const existingPoli = await this.prismaService.poli.findFirst({
       where: {
         poli_name: name,
       },
