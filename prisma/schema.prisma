@@ -73,6 +73,7 @@ model PengambilanObat {
 
 model Antrian {
   id         Int    @id @default(autoincrement())
+
   poli       TPoli  @relation(fields: [t_poli_id], references: [id])
   t_poli_id    BigInt
   passien    Pasien @relation(fields: [passien_id], references: [pasien_id])
