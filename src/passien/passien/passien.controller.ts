@@ -7,6 +7,8 @@ import {
 
   HttpException,
   HttpStatus,
+  Inject,
+  Logger,
   Param,
   Post,
   Query,
@@ -16,10 +18,15 @@ import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { WebResponse } from 'src/model/web.model';
 import { StatusPassien } from 'src/utils/utils';
 import { BaseResponse } from 'src/model/BaseResponse.model';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 @Controller('passien')
 export class PassienController {
-  constructor(private passienService: PassienService) {}
+  constructor(private passienService: PassienService,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    
+    
+    ) {}
 
   @Post('/register-passien')
   async registerPassien(
@@ -32,6 +39,7 @@ export class PassienController {
         message: StatusPassien.SUCCESS_REGISTER_PASSIEN,
       };
     } catch (error) {
+      this.logger.warn(`Error while registering passien ${request.nomor_bpjs}`);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }

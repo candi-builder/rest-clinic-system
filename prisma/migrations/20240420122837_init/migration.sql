@@ -55,7 +55,8 @@ CREATE TABLE `pengambilan_obat` (
 -- CreateTable
 CREATE TABLE `antrian` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `poli_id` BIGINT NOT NULL,
+    `t_poli_id` BIGINT NOT NULL,
+    `passien_id` BIGINT NOT NULL,
     `status` ENUM('WAITING', 'CHECKING', 'PICKUP', 'DONE') NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -83,7 +84,10 @@ ALTER TABLE `pengambilan_obat` ADD CONSTRAINT `pengambilan_obat_resep_id_fkey` F
 ALTER TABLE `pengambilan_obat` ADD CONSTRAINT `pengambilan_obat_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`uuid`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `antrian` ADD CONSTRAINT `antrian_poli_id_fkey` FOREIGN KEY (`poli_id`) REFERENCES `t_poli`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `antrian` ADD CONSTRAINT `antrian_t_poli_id_fkey` FOREIGN KEY (`t_poli_id`) REFERENCES `t_poli`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `antrian` ADD CONSTRAINT `antrian_passien_id_fkey` FOREIGN KEY (`passien_id`) REFERENCES `pasien`(`pasien_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `t_poli` ADD CONSTRAINT `t_poli_poli_id_fkey` FOREIGN KEY (`poli_id`) REFERENCES `poli`(`poli_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
