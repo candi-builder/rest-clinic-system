@@ -3,10 +3,13 @@ import {
   Controller,
   Get,
 
+  HttpCode,
+
   HttpException,
   HttpStatus,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { PassienService } from './passien.service';
 import { PassienRequest, PassienResponse } from 'src/model/passien.model';
@@ -42,4 +45,20 @@ export class PassienController {
     );
     return passien;
   }
+
+  @Get('/get-list-by-poli/:poliId')
+  @HttpCode(200)
+  async getListPassien(
+    @Query('page') page: number = 1,
+    @Query('size') size: number = 10,
+    @Param('poliId') poliId: number,
+  ): Promise<BaseResponse<PassienResponse[]>> {
+    const passien = await this.passienService.getListPassienByPoliId(page, size, poliId);
+    return passien;
+  }
+
+  
 }
+
+
+
