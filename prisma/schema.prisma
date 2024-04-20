@@ -53,7 +53,7 @@ model Resep {
   pasien           Pasien            @relation(fields: [pasien_id], references: [pasien_id])
   pasien_id        BigInt
   tanggal_resep    DateTime
-  keterangen_Resep String
+  keterangan_resep String
   hasil_diagnosa   String
   PengambilanObat  PengambilanObat[]
 
