@@ -4,7 +4,7 @@ import { PrismaService } from 'src/common/prisma.service';
 import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { PassienValidation } from './passien.validation';
 import { ValidationService } from 'src/common/validation.service';
-import { BaseResponse } from 'src/model/BaseResponse.model';
+import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
 
 @Injectable()
 export class PassienService {
@@ -102,4 +102,77 @@ export class PassienService {
       message: 'Success get pasien by id',
     };
   }
+
+
+  async getListPassienByPoliId(
+    page: number,
+    size: number,
+    poli_id: number,
+  ) : Promise<BaseResponse<PassienResponse[]>> {
+    this.logger.warn(`Getting list pasien by poli id ${poli_id}`);
+
+    const totalCount = await this.prismaService.pasien.count();
+    const totalPages = Math.ceil(totalCount / size);
+    const pasien = await this.prismaService.pasien.findMany({
+      where:{
+        poli_id: poli_id,
+        
+      },
+      skip: (page - 1) * size,
+      take: size,
+      select: {
+        pasien_id: true,
+        nomor_bpjs: true,
+        nama_passien: true,
+        tanggal_lahir: true,
+        alamat: true,
+        faskes_tingkat_satu: true,
+        poli_id: true,
+        poli: {
+          include:{
+            TPoli:{
+              include:{
+                user:true
+              }
+            }
+          },
+        },
+        Antrian: true,
+      },
+    });
+
+    const PassienResponse: PassienResponse[] = pasien.map((item) => ({
+      passien_id: Number(item.pasien_id),
+      nomor_bpjs: item.nomor_bpjs,
+      nama_passien: item.nama_passien,
+      tanggal_lahir: item.tanggal_lahir,
+      alamat: item.alamat,
+      faskes_tingkat_satu: item.faskes_tingkat_satu,
+      poli: item.poli.poli_name,
+      dokter: item.poli.TPoli[0].user.full_name,
+      status: item.Antrian[0]?.status, // Optional chaining untuk menangani Antrian kosong
+    }));
+
+    const paginationData: PaginationData = {
+      page,
+      size,
+      total_page: totalPages,
+      total_data: totalCount,
+    };
+
+    return{
+      data: PassienResponse,
+      pagination: paginationData,
+      status_code: 200,
+      message: 'Success get list pasien'
+    }
+
+
+   
+    
+    
+    
+
+
+}
 }

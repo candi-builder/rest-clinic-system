@@ -25,7 +25,6 @@ export class UserController {
     }
     catch(error){
       return {
-        
         message: error.issues[0]
       };
     }
