@@ -5,6 +5,8 @@ import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { PassienValidation } from './passien.validation';
 import { ValidationService } from 'src/common/validation.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
+import { Status } from '@prisma/client';
+
 
 @Injectable()
 export class PassienService {
@@ -29,6 +31,7 @@ export class PassienService {
         where: {
           nomor_bpjs: registerPassienRequest.nomor_bpjs,
         },
+       
       });
 
       const checkPoli = await this.prismaService.poli.findFirst({
@@ -45,13 +48,15 @@ export class PassienService {
         throw new HttpException('Nomor BPJS sudah terdaftar', 400);
       }
 
-      const createPassien = await this.prismaService.pasien.create({
+      await this.prismaService.pasien.create({
         data: {
           ...registerPassienRequest,
           tanggal_lahir: new Date(registerPassienRequest.tanggal_lahir),
 
         },
       });
+
+      
 
       
 
@@ -85,6 +90,8 @@ export class PassienService {
       },
     });
 
+    
+
     if (!pasien) {
       throw new HttpException('Pasien tidak ditemukan', 404);
     }
@@ -100,7 +107,8 @@ export class PassienService {
         poli_id: Number(pasien.poli_id),
         poli: pasien.poli.poli_name,
         dokter: pasien.poli.TPoli[0].user.full_name,
-        status: pasien.poli.TPoli[0].Antrian[0].status, // Optional chaining untuk menangani Antrian kosong
+        status: pasien.poli.TPoli[0].Antrian[0]?.status, // Optional chaining untuk menangani Antrian kosong
+        
       },
       status_code: 200,
       message: 'Success get pasien by id',
@@ -133,11 +141,14 @@ export class PassienService {
             TPoli:{
               include:{
                 user:true,
-                Antrian: true,
+                Antrian:true,
+                
               }
             }
           },
         },
+        
+        
        
 
       },
@@ -145,17 +156,23 @@ export class PassienService {
       take: size,
     });
 
-    const PassienResponse: PassienResponse[] = pasien.map((pasien) => ({
-      passien_id: Number(pasien.pasien_id),
-      nomor_bpjs: pasien.nomor_bpjs,
-      nama_passien: pasien.nama_passien,
-      tanggal_lahir: pasien.tanggal_lahir,
-      alamat: pasien.alamat,
-      faskes_tingkat_satu: pasien.faskes_tingkat_satu,
-      poli: pasien.poli.poli_name,
-      dokter: pasien.poli.TPoli[0].user.full_name,
-      status: pasien.poli.TPoli[0].Antrian[0]?.status, // Optional chaining untuk menangani Antrian kosong
-    }));
+    const PassienResponse: PassienResponse[] = pasien.map((pasien) => {
+      const antrianPassien = pasien.poli.TPoli[0].Antrian.find(
+        (antrian) => antrian.passien_id === pasien.pasien_id,
+      );
+
+      return {
+        passien_id: Number(pasien.pasien_id),
+        nomor_bpjs: pasien.nomor_bpjs,
+        nama_passien: pasien.nama_passien,
+        tanggal_lahir: pasien.tanggal_lahir,
+        alamat: pasien.alamat,
+        faskes_tingkat_satu: pasien.faskes_tingkat_satu,
+        poli: pasien.poli.poli_name,
+        dokter: pasien.poli.TPoli[0].user.full_name,
+        status: antrianPassien ? antrianPassien.status : 'Tidak ada antrian'
+      };
+    });
 
     const paginationData: PaginationData = {
       page,
