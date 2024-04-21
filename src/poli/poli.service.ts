@@ -52,7 +52,7 @@ export class PoliService {
   ): Promise<BaseResponse<string>> {
     this.logger.debug(`add poli member`);
 
-    const existingPoli = await this.prismaService.poli.findUnique({
+    const existingPoli = await this.prismaService.poli.findFirst({
       where: {
         poli_id: poli_id,
       },

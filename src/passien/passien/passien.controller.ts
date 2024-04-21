@@ -14,7 +14,6 @@ import {
 import { PassienService } from './passien.service';
 import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { WebResponse } from 'src/model/web.model';
-import { StatusPassien } from 'src/utils/utils';
 import { BaseResponse } from 'src/model/BaseResponse.model';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
