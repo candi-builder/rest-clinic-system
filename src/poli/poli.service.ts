@@ -19,7 +19,7 @@ export class PoliService {
         poli_name: name,
       },
     });
-    if (name.length < 1) {
+    if (!name) {
       throw new HttpException('nama poli tidak boleh kosong ', 400);
     }
 

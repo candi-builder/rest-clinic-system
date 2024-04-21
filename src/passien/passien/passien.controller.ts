@@ -2,9 +2,7 @@ import {
   Body,
   Controller,
   Get,
-
   HttpCode,
-
   HttpException,
   HttpStatus,
   Inject,
@@ -32,16 +30,8 @@ export class PassienController {
   async registerPassien(
     @Body() request: PassienRequest,
   ): Promise<WebResponse<PassienResponse>> {
-    try {
-      await this.passienService.register(request);
-      return {
-        status_code: HttpStatus.OK,
-        message: StatusPassien.SUCCESS_REGISTER_PASSIEN,
-      };
-    } catch (error) {
-      this.logger.warn(`Error while registering passien ${request.nomor_bpjs}`);
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
+      const passien = await this.passienService.register(request);
+      return passien;
   }
 
   @Get(':passienId')

@@ -5,7 +5,6 @@ import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { PassienValidation } from './passien.validation';
 import { ValidationService } from 'src/common/validation.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
-import { Status } from '@prisma/client';
 
 
 @Injectable()
@@ -26,7 +25,6 @@ export class PassienService {
         request,
       );
 
-    try {
       const existingPassien = await this.prismaService.pasien.findFirst({
         where: {
           nomor_bpjs: registerPassienRequest.nomor_bpjs,
@@ -40,34 +38,33 @@ export class PassienService {
         },
       });
 
-      if (!checkPoli) {
-        throw new HttpException('Poli tidak ditemukan', 400);
-      }
-
       if (existingPassien) {
         throw new HttpException('Nomor BPJS sudah terdaftar', 400);
       }
 
-      await this.prismaService.pasien.create({
+      if (!checkPoli) {
+        throw new HttpException('Poli tidak ditemukan', 400);
+      }
+
+
+      const passien = await this.prismaService.pasien.create({
         data: {
           ...registerPassienRequest,
           tanggal_lahir: new Date(registerPassienRequest.tanggal_lahir),
-
         },
       });
-
-      
-
-      
-
+      await this.prismaService.antrian.create({
+        data: {
+          passien_id:passien.pasien_id,
+          poli_id:passien.poli_id,
+          status:"WAITING",
+        },
+      });
       return {
         status_code: 200,
         message: 'Passien berhasil didaftarkan',
       };
-    } catch (error) {
-      this.logger.warn(error);
-      throw Error(error);
-    }
+    
   }
 
   async getPassienDetail(id: number): Promise<BaseResponse<PassienResponse>> {
