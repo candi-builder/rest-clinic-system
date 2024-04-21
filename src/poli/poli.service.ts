@@ -19,7 +19,7 @@ export class PoliService {
         poli_name: name,
       },
     });
-    if (name.length < 1) {
+    if (!name) {
       throw new HttpException('nama poli tidak boleh kosong ', 400);
     }
 
@@ -52,7 +52,7 @@ export class PoliService {
   ): Promise<BaseResponse<string>> {
     this.logger.debug(`add poli member`);
 
-    const existingPoli = await this.prismaService.poli.findUnique({
+    const existingPoli = await this.prismaService.poli.findFirst({
       where: {
         poli_id: poli_id,
       },

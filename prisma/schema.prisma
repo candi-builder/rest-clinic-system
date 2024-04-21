@@ -30,7 +30,6 @@ model Poli {
   poli_name String   @unique
   Pasien    Pasien[]
   TPoli     TPoli[]
-
   @@map("poli")
 }
 
@@ -38,7 +37,7 @@ model Pasien {
   pasien_id           BigInt    @id @default(autoincrement())
   nomor_bpjs          String
   nama_passien        String
-  tanggal_lahir       DateTime
+  tanggal_lahir       DateTime    @db.Date
   alamat              String
   faskes_tingkat_satu String
   poli                Poli      @relation(fields: [poli_id], references: [poli_id])
@@ -53,7 +52,7 @@ model Resep {
   resep_id         BigInt            @id @default(autoincrement())
   pasien           Pasien            @relation(fields: [pasien_id], references: [pasien_id])
   pasien_id        BigInt
-  tanggal_resep    DateTime
+  tanggal_resep    DateTime           @db.Date
   keterangan_resep String
   hasil_diagnosa   String
   PengambilanObat  PengambilanObat[]
@@ -79,7 +78,7 @@ model Antrian {
   passien    Pasien @relation(fields: [passien_id], references: [pasien_id])
   passien_id BigInt
   status     Status
-
+  tanggal    DateTime   @db.Date
   @@map("antrian")
 }
 

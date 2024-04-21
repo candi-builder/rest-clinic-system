@@ -2,9 +2,7 @@ import {
   Body,
   Controller,
   Get,
-
   HttpCode,
-
   HttpException,
   HttpStatus,
   Inject,
@@ -16,7 +14,6 @@ import {
 import { PassienService } from './passien.service';
 import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { WebResponse } from 'src/model/web.model';
-import { StatusPassien } from 'src/utils/utils';
 import { BaseResponse } from 'src/model/BaseResponse.model';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
@@ -32,16 +29,8 @@ export class PassienController {
   async registerPassien(
     @Body() request: PassienRequest,
   ): Promise<WebResponse<PassienResponse>> {
-    try {
-      await this.passienService.register(request);
-      return {
-        status_code: HttpStatus.OK,
-        message: StatusPassien.SUCCESS_REGISTER_PASSIEN,
-      };
-    } catch (error) {
-      this.logger.warn(`Error while registering passien ${request.nomor_bpjs}`);
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
+      const passien = await this.passienService.register(request);
+      return passien;
   }
 
   @Get(':passienId')

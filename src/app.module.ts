@@ -7,18 +7,18 @@ import { UserModule } from './user/user.module';
 import { PassienModule } from './passien/passien.module';
 import { PoliModule } from './poli/poli.module';
 import { DoctorModule } from './doctor/doctor.module';
+import { AntrianModule } from './antrian/antrian.module';
 
 @Module({
-  imports: [CommonModule, 
-            UserModule, 
-            UserManagementModule, 
-            PoliModule,
-            PassienModule,
-            DoctorModule,
-
-            
-          
-          ],
+  imports: [
+    CommonModule,
+    UserModule,
+    UserManagementModule,
+    PoliModule,
+    PassienModule,
+    DoctorModule,
+    AntrianModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

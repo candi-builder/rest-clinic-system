@@ -5,8 +5,6 @@ import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { PassienValidation } from './passien.validation';
 import { ValidationService } from 'src/common/validation.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
-import { Status } from '@prisma/client';
-
 
 @Injectable()
 export class PassienService {
@@ -26,48 +24,44 @@ export class PassienService {
         request,
       );
 
-    try {
-      const existingPassien = await this.prismaService.pasien.findFirst({
-        where: {
-          nomor_bpjs: registerPassienRequest.nomor_bpjs,
-        },
-       
-      });
+    const existingPassien = await this.prismaService.pasien.findFirst({
+      where: {
+        nomor_bpjs: registerPassienRequest.nomor_bpjs,
+      },
+    });
 
-      const checkPoli = await this.prismaService.poli.findFirst({
-        where: {
-          poli_id: registerPassienRequest.poli_id,
-        },
-      });
+    const checkPoli = await this.prismaService.poli.findFirst({
+      where: {
+        poli_id: registerPassienRequest.poli_id,
+      },
+    });
 
-      if (!checkPoli) {
-        throw new HttpException('Poli tidak ditemukan', 400);
-      }
-
-      if (existingPassien) {
-        throw new HttpException('Nomor BPJS sudah terdaftar', 400);
-      }
-
-      await this.prismaService.pasien.create({
-        data: {
-          ...registerPassienRequest,
-          tanggal_lahir: new Date(registerPassienRequest.tanggal_lahir),
-
-        },
-      });
-
-      
-
-      
-
-      return {
-        status_code: 200,
-        message: 'Passien berhasil didaftarkan',
-      };
-    } catch (error) {
-      this.logger.warn(error);
-      throw Error(error);
+    if (existingPassien) {
+      throw new HttpException('Nomor BPJS sudah terdaftar', 400);
     }
+
+    if (!checkPoli) {
+      throw new HttpException('Poli tidak ditemukan', 400);
+    }
+
+    const passien = await this.prismaService.pasien.create({
+      data: {
+        ...registerPassienRequest,
+        tanggal_lahir: new Date(registerPassienRequest.tanggal_lahir),
+      },
+    });
+    await this.prismaService.antrian.create({
+      data: {
+        passien_id: passien.pasien_id,
+        t_poli_id: passien.poli_id,
+        tanggal: new Date(),
+        status: 'WAITING',
+      },
+    });
+    return {
+      status_code: 200,
+      message: 'Passien berhasil didaftarkan',
+    };
   }
 
   async getPassienDetail(id: number): Promise<BaseResponse<PassienResponse>> {
@@ -86,11 +80,8 @@ export class PassienService {
             },
           },
         },
-       
       },
     });
-
-    
 
     if (!pasien) {
       throw new HttpException('Pasien tidak ditemukan', 404);
@@ -108,25 +99,23 @@ export class PassienService {
         poli: pasien.poli.poli_name,
         dokter: pasien.poli.TPoli[0].user.full_name,
         status: pasien.poli.TPoli[0].Antrian[0]?.status, // Optional chaining untuk menangani Antrian kosong
-        
       },
       status_code: 200,
       message: 'Success get pasien by id',
     };
   }
 
-
   async getListPassienByPoliId(
     page: number,
     size: number,
     poli_id: number,
-  ) : Promise<BaseResponse<PassienResponse[]>> {
+  ): Promise<BaseResponse<PassienResponse[]>> {
     this.logger.warn(`Getting list pasien by poli id ${poli_id}`);
-  
+
     const totalCount = await this.prismaService.pasien.count();
     const totalPages = Math.ceil(totalCount / size);
     const pasien = await this.prismaService.pasien.findMany({
-      where:{
+      where: {
         poli_id: poli_id,
       },
       select: {
@@ -137,20 +126,15 @@ export class PassienService {
         alamat: true,
         faskes_tingkat_satu: true,
         poli: {
-          include:{
-            TPoli:{
-              include:{
-                user:true,
-                Antrian:true,
-                
-              }
-            }
+          include: {
+            TPoli: {
+              include: {
+                user: true,
+                Antrian: true,
+              },
+            },
           },
         },
-        
-        
-       
-
       },
       skip: (page - 1) * size,
       take: size,
@@ -170,7 +154,7 @@ export class PassienService {
         faskes_tingkat_satu: pasien.faskes_tingkat_satu,
         poli: pasien.poli.poli_name,
         dokter: pasien.poli.TPoli[0].user.full_name,
-        status: antrianPassien ? antrianPassien.status : 'Tidak ada antrian'
+        status: antrianPassien ? antrianPassien.status : 'Tidak ada antrian',
       };
     });
 
@@ -181,19 +165,11 @@ export class PassienService {
       total_data: totalCount,
     };
 
-    return{
+    return {
       data: PassienResponse,
       pagination: paginationData,
       status_code: 200,
-      message: 'Success get list pasien'
-    }
-
-
-   
-    
-    
-    
-
-
-}
+      message: 'Success get list pasien',
+    };
+  }
 }

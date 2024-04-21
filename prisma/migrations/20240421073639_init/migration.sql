@@ -24,7 +24,7 @@ CREATE TABLE `pasien` (
     `pasien_id` BIGINT NOT NULL AUTO_INCREMENT,
     `nomor_bpjs` VARCHAR(191) NOT NULL,
     `nama_passien` VARCHAR(191) NOT NULL,
-    `tanggal_lahir` DATETIME(3) NOT NULL,
+    `tanggal_lahir` DATE NOT NULL,
     `alamat` VARCHAR(191) NOT NULL,
     `faskes_tingkat_satu` VARCHAR(191) NOT NULL,
     `poli_id` BIGINT NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE `pasien` (
 CREATE TABLE `resep` (
     `resep_id` BIGINT NOT NULL AUTO_INCREMENT,
     `pasien_id` BIGINT NOT NULL,
-    `tanggal_resep` DATETIME(3) NOT NULL,
+    `tanggal_resep` DATE NOT NULL,
     `keterangan_resep` VARCHAR(191) NOT NULL,
     `hasil_diagnosa` VARCHAR(191) NOT NULL,
 
@@ -58,6 +58,7 @@ CREATE TABLE `antrian` (
     `t_poli_id` BIGINT NOT NULL,
     `passien_id` BIGINT NOT NULL,
     `status` ENUM('WAITING', 'CHECKING', 'PICKUP', 'DONE') NOT NULL,
+    `tanggal` DATE NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
