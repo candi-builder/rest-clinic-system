@@ -6,6 +6,7 @@ import { UserManagementModule } from './user-management/user-management.module';
 import { UserModule } from './user/user.module';
 import { PassienModule } from './passien/passien.module';
 import { PoliModule } from './poli/poli.module';
+import { DoctorModule } from './doctor/doctor.module';
 
 @Module({
   imports: [CommonModule, 
@@ -13,6 +14,7 @@ import { PoliModule } from './poli/poli.module';
             UserManagementModule, 
             PoliModule,
             PassienModule,
+            DoctorModule,
 
             
           
