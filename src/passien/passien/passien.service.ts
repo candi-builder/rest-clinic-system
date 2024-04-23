@@ -1,10 +1,12 @@
-import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { PassienRequest, PassienResponse } from 'src/model/passien.model';
 import { PassienValidation } from './passien.validation';
 import { ValidationService } from 'src/common/validation.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
+import { ZodError } from 'zod';
+import { fromZodError } from 'zod-validation-error';
 
 @Injectable()
 export class PassienService {
@@ -44,6 +46,8 @@ export class PassienService {
       throw new HttpException('Poli tidak ditemukan', 400);
     }
 
+
+    try{
     const passien = await this.prismaService.pasien.create({
       data: {
         ...registerPassienRequest,
@@ -62,9 +66,19 @@ export class PassienService {
       status_code: 200,
       message: 'Passien berhasil didaftarkan',
     };
+  }catch (error) {
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+      throw new HttpException(validationError, HttpStatus.BAD_REQUEST);
+    } else {
+      throw error;
+    }
   }
+}
 
   async getPassienDetail(id: number): Promise<BaseResponse<PassienResponse>> {
+
+    try{
     const pasien = await this.prismaService.pasien.findUnique({
       where: {
         pasien_id: id,
@@ -103,6 +117,15 @@ export class PassienService {
       status_code: 200,
       message: 'Success get pasien by id',
     };
+
+  }catch (error) {
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+      throw new HttpException(validationError, HttpStatus.BAD_REQUEST);
+    } else {
+      throw error;
+    }
+  }
   }
 
   async getListPassienByPoliId(
@@ -112,6 +135,10 @@ export class PassienService {
   ): Promise<BaseResponse<PassienResponse[]>> {
     this.logger.warn(`Getting list pasien by poli id ${poli_id}`);
 
+
+    try{
+
+    
     const totalCount = await this.prismaService.pasien.count();
     const totalPages = Math.ceil(totalCount / size);
     const pasien = await this.prismaService.pasien.findMany({
@@ -171,5 +198,13 @@ export class PassienService {
       status_code: 200,
       message: 'Success get list pasien',
     };
+  }catch (error) {
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+      throw new HttpException(validationError, HttpStatus.BAD_REQUEST);
+    } else {
+      throw error;
+    }
   }
+}
 }

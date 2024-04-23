@@ -55,7 +55,6 @@ export class DoctorService {
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         throw new HttpException(validationError, HttpStatus.BAD_REQUEST);
-
       } else {
         throw error;
       }
