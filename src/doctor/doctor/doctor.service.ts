@@ -76,12 +76,8 @@ export class DoctorService {
         include: {
           poli: {
             include: {
-              TPoli: {
-                include: {
-                  user: true,
-                  Antrian: true,
-                },
-              },
+              user: true,
+              Antrian: true,
             },
           },
         },
@@ -124,7 +120,7 @@ export class DoctorService {
         const pengambilanObat = await prisma.pengambilanObat.create({
           data: {
             resep_id: diagnosa.resep_id,
-            user_id: doctorName.poli.TPoli[0].user.uuid,
+            user_id: doctorName.poli.user.uuid
           },
         });
     
@@ -134,7 +130,7 @@ export class DoctorService {
           keterangan_resep: diagnosa.keterangan_resep,
           hasil_diagnosa: diagnosa.hasil_diagnosa,
           status: updatePasien.status,
-          doctor: doctorName.poli.TPoli[0].user.full_name,
+          doctor: doctorName.poli.user.full_name,
           pengambilan_obat_id: pengambilanObat.id,
         };
       });
