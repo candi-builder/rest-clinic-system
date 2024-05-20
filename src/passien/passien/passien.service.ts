@@ -64,7 +64,19 @@ export class PassienService {
         message: 'Passien berhasil didaftarkan',
       };
     } catch (error) {
-      this.handleError(error);
+      this.logger.debug(`Registering passien ${JSON.stringify(error)}`);
+
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+
+        return {
+          message: validationError.message,
+          status_code: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+
+        throw error;
+      }
     }
   }
 
@@ -91,7 +103,19 @@ export class PassienService {
         message: 'Success get pasien by id',
       };
     } catch (error) {
-      this.handleError(error);
+      this.logger.debug(`Get passien by id ${JSON.stringify(error)}`);
+
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+
+        return {
+          message: validationError.message,
+          status_code: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+
+        throw error;
+      }
     }
   }
 
@@ -139,7 +163,19 @@ export class PassienService {
         message: 'Success get list pasien',
       };
     } catch (error) {
-      this.handleError(error);
+      this.logger.debug(`Get List Pasien ${JSON.stringify(error)}`);
+
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+
+        return {
+          message: validationError.message,
+          status_code: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+
+        throw error;
+      }
     }
   }
 
@@ -163,12 +199,5 @@ export class PassienService {
     };
   }
 
-  private handleError(error: any): void {
-    if (error instanceof ZodError) {
-      const validationError = fromZodError(error);
-      throw new HttpException(validationError, HttpStatus.BAD_REQUEST);
-    } else {
-      throw error;
-    }
-  }
+  
 }

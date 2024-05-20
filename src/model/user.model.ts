@@ -14,6 +14,7 @@ export class UserResponse {
   password?: string;
   role: Role;
   full_name?: string;
+  
 }
 
 export class LoginRequest {

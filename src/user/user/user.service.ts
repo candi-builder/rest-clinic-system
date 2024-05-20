@@ -1,4 +1,4 @@
-import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { ValidationService } from 'src/common/validation.service';
@@ -10,6 +10,9 @@ import {
 import { UserValidation } from './user.validation';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
+import { ZodError } from 'zod';
+import { fromZodError } from 'zod-validation-error';
+import { BaseResponse } from 'src/model/BaseResponse.model';
 
 @Injectable()
 export class UserService {
@@ -19,8 +22,12 @@ export class UserService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  async register(request: RegisterUserRequest): Promise<UserResponse> {
+  async register(request: RegisterUserRequest): Promise<BaseResponse<UserResponse>> {
+
+    
     this.logger.debug(`Registering user ${request.username}`);
+
+    try{
     const registerUserRequest: RegisterUserRequest =
       this.validationService.validate(UserValidation.REGISTER, request);
 
@@ -48,17 +55,38 @@ export class UserService {
     });
 
     return {
+      data: {
       uuid: user.uuid,
       username: user.username,
       password: user.password,
       role: user.roles,
       full_name: user.full_name,
-    };
+    },
+    status_code: HttpStatus.OK,
+    message: 'User berhasil ditambahkan',
+  }
+    
+  }catch (error) {
+    this.logger.debug(`Registering user ${JSON.stringify(error)}`);
+
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+
+      return {
+        message: validationError.message,
+        status_code: HttpStatus.BAD_REQUEST,
+      };
+    } else {
+
+      throw error;
+      }
+  }
   }
 
-  async login(request: LoginRequest): Promise<UserResponse> {
+  async login(request: LoginRequest): Promise<BaseResponse<UserResponse>> {
     this.logger.debug(`Logging in user ${JSON.stringify(request)}`);
 
+    try{
     const loginRequest: LoginRequest = this.validationService.validate(
       UserValidation.LOGIN,
       request,
@@ -90,9 +118,30 @@ export class UserService {
     }
 
     return {
+      data:{
       uuid: user.uuid,
       role: user.roles,
       full_name: user.full_name,
+    },
+    status_code: HttpStatus.OK,
+    message: 'User berhasil login',
+    
+  }
+}catch (error) {
+  this.logger.debug(`Diagnosa create ${JSON.stringify(error)}`);
+
+  if (error instanceof ZodError) {
+    const validationError = fromZodError(error);
+
+    return {
+      message: validationError.message,
+      status_code: HttpStatus.BAD_REQUEST,
     };
+  } else {
+
+    throw error;
+      }
+}
+  
   }
 }

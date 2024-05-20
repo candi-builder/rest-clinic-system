@@ -1,19 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { Status } from '@prisma/client';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
 import { AntrianResponse } from 'src/model/antrian.model';
 import { Utils } from 'src/utils/utils';
+import { ZodError } from 'zod';
+import { fromZodError } from 'zod-validation-error';
 
 @Injectable()
 export class AntrianService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService, @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {}
 
   async getAntrianDocter(
     page: number,
     size: number = 10,
     doctor: string,
   ): Promise<BaseResponse<AntrianResponse[]>> {
+
+    try{
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const totalCount = await this.prismaService.antrian.count({
@@ -94,12 +99,28 @@ export class AntrianService {
       status_code: 200,
       message: 'success',
     };
+  }catch (error) {
+    this.logger.debug(`get antrian docter ${JSON.stringify(error)}`);
+
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+
+      return {
+        message: validationError.message,
+        status_code: HttpStatus.BAD_REQUEST,
+      };
+    } else {
+
+      throw error;
+      }
+  }
   }
 
   async getAntrianPickup(
     page: number,
     size: number = 10,
   ): Promise<BaseResponse<AntrianResponse[]>> {
+    try{
     const totalCount = await this.prismaService.antrian.count(
 
     );
@@ -179,11 +200,28 @@ export class AntrianService {
       message: 'success',
     };
   }
+  catch (error) {
+    this.logger.debug(`get antrian pickup ${JSON.stringify(error)}`);
+
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+
+      return {
+        message: validationError.message,
+        status_code: HttpStatus.BAD_REQUEST,
+      };
+    } else {
+
+      throw error;
+      }
+  }
+  }
 
   async updateStatus(
     antrianId:number,
     status:Status,
   ):Promise<BaseResponse<string>>{
+    try{
     const antrianToUpdate = await this.prismaService.antrian.findUnique(
       {
         where:{
@@ -211,5 +249,20 @@ export class AntrianService {
       status_code:201,
       message:`Beharhasil Mengubah status ke ${status}`
     }
+  }catch (error) {
+    this.logger.debug(`Registering passien ${JSON.stringify(error)}`);
+
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+
+      return {
+        message: validationError.message,
+        status_code: HttpStatus.BAD_REQUEST,
+      };
+    } else {
+
+      throw error;
+      }
+  }
   }
 }

@@ -52,12 +52,19 @@ export class DoctorService {
         message: 'Status pasien berhasil diupdate',
       };
     } catch (error) {
+      this.logger.debug(`Update pasien ${JSON.stringify(error)}`);
+
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
-        throw new HttpException(validationError, HttpStatus.BAD_REQUEST);
+
+        return {
+          message: validationError.message,
+          status_code: HttpStatus.BAD_REQUEST,
+        };
       } else {
-        throw error;
-      }
+
+        throw error;
+      }
     }
 
   }
@@ -141,12 +148,19 @@ export class DoctorService {
         message: 'Diagnosa berhasil dibuat',
       };
     } catch (error) {
+      this.logger.debug(`Diagnosa create ${JSON.stringify(error)}`);
+
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
-        throw new HttpException(validationError, HttpStatus.BAD_REQUEST);
+
+        return {
+          message: validationError.message,
+          status_code: HttpStatus.BAD_REQUEST,
+        };
       } else {
-        throw error;
-      }
+
+        throw error;
+      }
     }
   }
 

@@ -1,8 +1,10 @@
-import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
 import { PoliResponse } from 'src/model/Poli.model';
+import { ZodError } from 'zod';
+import { fromZodError } from 'zod-validation-error';
 
 @Injectable()
 export class PoliService {
@@ -52,6 +54,8 @@ export class PoliService {
   ): Promise<BaseResponse<string>> {
     this.logger.debug(`add poli member`);
 
+    try{
+
     const existingPoli = await this.prismaService.poli.findFirst({
       where: {
         poli_id: poli_id,
@@ -81,6 +85,8 @@ export class PoliService {
         400,
       );
     }
+
+
     const addTPoli = await this.prismaService.tPoli.create({
       data: {
         poli_id: poli_id,
@@ -95,12 +101,29 @@ export class PoliService {
       status_code: 200,
       message: 'Berhasil menambah member',
     };
+  }catch (error) {
+    this.logger.debug(`Add Poli Member ${JSON.stringify(error)}`);
+
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+
+      return {
+        message: validationError.message,
+        status_code: HttpStatus.BAD_REQUEST,
+      };
+    } else {
+
+      throw error;
+      }
+  }
   }
 
   async getListPoli(
     page: number,
     size: number,
   ): Promise<BaseResponse<PoliResponse[]>> {
+
+    try{
     const totalCount = await this.prismaService.poli.count();
     const totalPages = Math.ceil(totalCount / size);
     const polis = await this.prismaService.poli.findMany({
@@ -130,6 +153,21 @@ export class PoliService {
       status_code: 200,
       message: 'success',
     };
+  }catch (error) {
+    this.logger.debug(`get list poli ${JSON.stringify(error)}`);
+
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+
+      return {
+        message: validationError.message,
+        status_code: HttpStatus.BAD_REQUEST,
+      };
+    } else {
+
+      throw error;
+      }
+  }
   }
 
   async getListMember(
@@ -137,6 +175,7 @@ export class PoliService {
     size: number,
     poli_id: bigint,
   ): Promise<BaseResponse<PoliResponse[]>> {
+    try{
     const totalCount = await this.prismaService.tPoli.count({
       where: {
         poli: {
@@ -187,5 +226,20 @@ export class PoliService {
       status_code: 200,
       message: 'success',
     };
+  }catch (error) {
+    this.logger.debug(`get list member ${JSON.stringify(error)}`);
+
+    if (error instanceof ZodError) {
+      const validationError = fromZodError(error);
+
+      return {
+        message: validationError.message,
+        status_code: HttpStatus.BAD_REQUEST,
+      };
+    } else {
+
+      throw error;
+      }
+  }
   }
 }
