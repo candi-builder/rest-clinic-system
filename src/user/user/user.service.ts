@@ -99,7 +99,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new HttpException('User or password invalid', 401);
+      throw new HttpException('User not register', 401);
     }
 
     /* Login Validation */
@@ -113,7 +113,7 @@ export class UserService {
     );
 
     if (!isPasswordValid) {
-      throw new HttpException('User or password invalid', 401);
+      throw new HttpException(' password invalid', 401);
       // this.logger.error(`Password for user ${loginRequest.username} is invalid`)
     }
 

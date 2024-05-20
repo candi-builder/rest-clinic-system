@@ -45,6 +45,13 @@ export class PoliController {
     const poli = await this.poliService.getListPoli(page, size);
     return poli;
   }
+  @Get("/member")
+  @HttpCode(200)
+  async getListMember(
+  ): Promise<BaseResponse<PoliResponse[]>> {
+    const poli = await this.poliService.getListTpoli();
+    return poli;
+  }
   @Get(':id')
   @HttpCode(200)
   async getListPoliMember(

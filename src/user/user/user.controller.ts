@@ -6,51 +6,34 @@ import {
   RegisterUserRequest,
   UserResponse,
 } from 'src/model/user.model';
+import { BaseResponse } from 'src/model/BaseResponse.model';
 
-@Controller()
+@Controller('auth')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('/register-user')
   async registerUser(
     @Body() request: RegisterUserRequest,
-  ): Promise<WebResponse<UserResponse>> {
-
-    try{
+  ): Promise<BaseResponse<UserResponse>> {
+    try {
       const result = await this.userService.register(request);
 
-      return {
-        message: `User registered as ${result.role}`
-      };
-    }
-    catch(error){
-      return {
-        message: error.issues[0]
-      };
+      return result;
+    } catch (error) {
+      return error;
     }
   }
-    
-   
-
- 
 
   @Post('/login')
-    async login(@Body() request: LoginRequest): Promise<WebResponse<UserResponse>> {
-
-      try{
-        const result = await this.userService.login(request);
-        return {
-          data: result,
-          message: "Login Berhasil!",
-          };
-
-      }catch
-      {
-        return{
-          status_code: HttpStatus.BAD_REQUEST,
-          message: "Login Gagal!",
-        };
-      }
-        
+  async login(
+    @Body() request: LoginRequest,
+  ): Promise<WebResponse<UserResponse>> {
+    try {
+      const result = await this.userService.login(request);
+      return result
+    } catch(error) {
+     return error
     }
+  }
 }
