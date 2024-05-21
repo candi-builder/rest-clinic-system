@@ -26,7 +26,8 @@ export class PassienService {
     request: PassienRequest,
   ): Promise<BaseResponse<PassienResponse>> {
     this.logger.debug(`Registering passien ${JSON.stringify(request)}`);
-
+    
+    try {
     const registerPassienRequest = this.validationService.validate(
       PassienValidation.REGISTER_PASSIEN,
       request,
@@ -42,7 +43,7 @@ export class PassienService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    
     const checkPoli = await this.prismaService.tPoli.findFirst({
       where: { id: registerPassienRequest.poli_id },
     });
@@ -51,7 +52,7 @@ export class PassienService {
       throw new HttpException('Poli tidak ditemukan', HttpStatus.BAD_REQUEST);
     }
 
-    try {
+    
       const passien = await this.prismaService.pasien.create({
         data: {
           ...registerPassienRequest,
