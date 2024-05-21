@@ -176,6 +176,7 @@ export class PoliService {
       const polis = await this.prismaService.tPoli.findMany({
         select: {
           poli_id: true,
+          id:true,
           user: {
             select: {
               full_name: true,
@@ -190,7 +191,8 @@ export class PoliService {
       });
 
       const PoliResponse: PoliResponse[] = polis.map((user) => ({
-        id: user.poli_id.toString(),
+        id: user.id.toString(),
+        poliId: user.poli_id.toString(),
         poli_name: user.poli.poli_name,
         doctor: user.user.full_name,
       }));
