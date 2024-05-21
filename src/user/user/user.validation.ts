@@ -8,7 +8,7 @@ export class UserValidation {
   });
 
   static readonly LOGIN: ZodType = z.object({
-    username: z.string().min(3, 'Username or password is invalid!').max(100),
-    password: z.string().min(8, 'Username or password is invalid!').max(100),
+    username: z.string().min(3, 'Username must be at least 3 characters long').max(100),
+    password: z.string().min(8, 'Password must be at least 8 characters long').max(100),
   });
 }
