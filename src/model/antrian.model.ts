@@ -1,4 +1,5 @@
 export class AntrianResponse {
+  id: number;
   nomor_bpjs: string;
   nama_passien: string;
   dokter: string;

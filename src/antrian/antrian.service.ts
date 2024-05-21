@@ -76,6 +76,7 @@ export class AntrianService {
               },
             },
           },
+          id:true,
           status: true,
           tanggal: true,
         },
@@ -88,6 +89,7 @@ export class AntrianService {
         total_data: totalCount,
       };
       const AntrianResponse: AntrianResponse[] = data.map((antrian) => ({
+        id: antrian.id,
         nomor_bpjs: antrian.passien.nomor_bpjs,
         nama_passien: antrian.passien.nama_passien,
         dokter: antrian.poli.user.username,
@@ -160,6 +162,7 @@ export class AntrianService {
                       },
                     },
                   },
+                  id:true,
                   status: true,
                   tanggal: true,
                 },
@@ -179,6 +182,7 @@ export class AntrianService {
       data.forEach((resep) => {
         resep.pasien.Antrian.forEach((antrian) => {
           const response: AntrianResponse = {
+            id: antrian.id,
             nomor_bpjs: resep.pasien.nomor_bpjs,
             nama_passien: resep.pasien.nama_passien,
             dokter: antrian.poli.user.username,
