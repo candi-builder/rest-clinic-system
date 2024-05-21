@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { PassienRequest, PassienResponse } from 'src/model/passien.model';
@@ -16,9 +22,11 @@ export class PassienService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
-  async register(request: PassienRequest): Promise<BaseResponse<PassienResponse>> {
+  async register(
+    request: PassienRequest,
+  ): Promise<BaseResponse<PassienResponse>> {
     this.logger.debug(`Registering passien ${JSON.stringify(request)}`);
-    
+
     const registerPassienRequest = this.validationService.validate(
       PassienValidation.REGISTER_PASSIEN,
       request,
@@ -29,7 +37,10 @@ export class PassienService {
     });
 
     if (existingPassien) {
-      throw new HttpException('Nomor BPJS sudah terdaftar', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Nomor BPJS sudah terdaftar',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const checkPoli = await this.prismaService.tPoli.findFirst({
@@ -44,8 +55,7 @@ export class PassienService {
       const passien = await this.prismaService.pasien.create({
         data: {
           ...registerPassienRequest,
-          
-          
+
           tanggal_lahir: new Date(registerPassienRequest.tanggal_lahir),
         },
       });
@@ -74,9 +84,8 @@ export class PassienService {
           status_code: HttpStatus.BAD_REQUEST,
         };
       } else {
-
-        throw error;
-      }
+        throw error;
+      }
     }
   }
 
@@ -86,9 +95,9 @@ export class PassienService {
         where: { pasien_id: id },
         include: {
           poli: {
-            include:{
-              poli: true
-            }
+            include: {
+              poli: true,
+            },
           },
         },
       });
@@ -113,17 +122,22 @@ export class PassienService {
           status_code: HttpStatus.BAD_REQUEST,
         };
       } else {
-
-        throw error;
-      }
+        throw error;
+      }
     }
   }
 
-  async getListPassienByPoliId(page: number, size: number, poli_id: number): Promise<BaseResponse<PassienResponse[]>> {
+  async getListPassienByPoliId(
+    page: number,
+    size: number,
+    poli_id: number,
+  ): Promise<BaseResponse<PassienResponse[]>> {
     this.logger.warn(`Getting list pasien by poli id ${poli_id}`);
 
     try {
-      const totalCount = await this.prismaService.pasien.count({ where: { poli_id } });
+      const totalCount = await this.prismaService.pasien.count({
+        where: { poli_id },
+      });
       const totalPages = Math.ceil(totalCount / size);
 
       const pasienList = await this.prismaService.pasien.findMany({
@@ -140,7 +154,7 @@ export class PassienService {
           poli: {
             include: {
               user: true,
-              Antrian:true,
+              Antrian: true,
             },
           },
         },
@@ -173,9 +187,8 @@ export class PassienService {
           status_code: HttpStatus.BAD_REQUEST,
         };
       } else {
-
-        throw error;
-      }
+        throw error;
+      }
     }
   }
 
@@ -198,6 +211,4 @@ export class PassienService {
       status: antrianPassien ? antrianPassien.status : 'Tidak ada antrian',
     };
   }
-
-  
 }
