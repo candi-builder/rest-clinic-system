@@ -12,7 +12,7 @@ export class AntrianController {
   async getAntrianPemeriksaan(
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
-    @Param('poliId') dokterId: string,
+    @Param('dokterId') dokterId: string,
   ): Promise<BaseResponse<AntrianResponse[]>> {
     const antrian = await this.antrianService.getAntrianDocter(
       page,

@@ -25,39 +25,65 @@ export class AntrianService {
       today.setHours(0, 0, 0, 0);
       const totalCount = await this.prismaService.antrian.count({
         where: {
-          poli: {
-            user_id: doctor,
-          },
-          tanggal: {
-            gte: today,
-            lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-          },
-          OR: [
+          AND: [
             {
-              status: 'WAITING',
+              poli: {
+                user_id: doctor,
+              },
             },
             {
-              status: 'CHECKING',
+              tanggal: {
+                gte: today,
+                lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+              },
             },
-          ],
-        },
+            {
+              OR: [
+                {
+                  status: 'WAITING',
+                },
+                {
+                  status: 'CHECKING',
+                },
+              ],
+            }
+          ]
+        }
       });
       const totalPages = Math.ceil(totalCount / size);
+      
       const data = await this.prismaService.antrian.findMany({
         skip: (page - 1) * size,
         take: size,
         where: {
-          poli: {
-            user_id: doctor,
-          },
-          tanggal: {
-            gte: today,
-            lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-          },
+          AND: [
+            {
+              poli: {
+                user_id: doctor,
+              },
+            },
+            {
+              tanggal: {
+                gte: today,
+                lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+              },
+            },
+            {
+              OR: [
+                {
+                  status: 'WAITING',
+                },
+                {
+                  status: 'CHECKING',
+                },
+              ],
+            }
+          ]
         },
         select: {
           passien: {
             select: {
+              pasien_id:true,
               nomor_bpjs: true,
               nama_passien: true,
             },
@@ -81,7 +107,8 @@ export class AntrianService {
           tanggal: true,
         },
       });
-
+      
+      
       const paginationData: PaginationData = {
         page,
         size,
@@ -90,6 +117,7 @@ export class AntrianService {
       };
       const AntrianResponse: AntrianResponse[] = data.map((antrian) => ({
         id: antrian.id,
+        passien_id:antrian.passien.pasien_id.toString(),
         nomor_bpjs: antrian.passien.nomor_bpjs,
         nama_passien: antrian.passien.nama_passien,
         dokter: antrian.poli.user.username,
@@ -137,6 +165,7 @@ export class AntrianService {
           tanggal_resep: true,
           pasien: {
             select: {
+              pasien_id:true,
               nomor_bpjs: true,
               nama_passien: true,
               Antrian: {
@@ -183,6 +212,7 @@ export class AntrianService {
         resep.pasien.Antrian.forEach((antrian) => {
           const response: AntrianResponse = {
             id: antrian.id,
+            passien_id:resep.pasien.pasien_id.toString(),
             nomor_bpjs: resep.pasien.nomor_bpjs,
             nama_passien: resep.pasien.nama_passien,
             dokter: antrian.poli.user.username,
