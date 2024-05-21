@@ -18,7 +18,7 @@ export class DoctorService {
   ) {
   }
 
-  async updatePasienStatus(request: DoctorRequest): Promise<BaseResponse<DoctorResponse>> {
+  async updatePasienStatus(passienId: number, request: DoctorRequest): Promise<BaseResponse<DoctorResponse>> {
     try {
 
 
@@ -26,7 +26,7 @@ export class DoctorService {
 
       const antrianToUpdate = await this.prismaService.antrian.findFirst({
         where: {
-          passien_id: validateRequest.pasien_id,
+          passien_id: passienId,
         },
       });
 
@@ -45,7 +45,7 @@ export class DoctorService {
 
       return {
         data: {
-          pasien_id: request.pasien_id,
+          pasien_id: passienId,
           status: request.status,
         },
         status_code: 200,
