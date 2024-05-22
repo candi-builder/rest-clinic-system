@@ -108,6 +108,12 @@ export class AntrianService {
         },
       });
       
+      if(data.length === 0){
+        return {
+          status_code: HttpStatus.NOT_FOUND,
+          message: 'Data tidak ditemukan',
+        };
+      }
       
       const paginationData: PaginationData = {
         page,
@@ -200,6 +206,13 @@ export class AntrianService {
           },
         },
       });
+
+      if(data.length === 0){
+        return {
+          status_code: HttpStatus.NOT_FOUND,
+          message: 'Data tidak ditemukan',
+        };
+      }
       const paginationData: PaginationData = {
         page,
         size,
@@ -264,17 +277,23 @@ export class AntrianService {
           message: 'antrian tidak ditemukan',
         };
       }
-      await this.prismaService.antrian.update({
-        where: {
-          id: Number(antrianId),
-        },
-        data: {
-          status: status,
-        },
-      });
+      
+
+      if(
+        status !== 'WAITING' &&
+        status !== 'CHECKING' &&
+        status !== 'PICKUP' &&
+        status !== 'DONE'
+      ){
+        return {
+          status_code: 400,
+          message: 'Status tidak valid and should be Uppercase, Status Available: WAITING, CHECKING, PICKUP, DONE',
+        };
+     
+      };
       return {
         status_code: 201,
-        message: `Beharhasil Mengubah status ke ${status}`,
+        message: `Berhasil Mengubah status ke ${status}`,
       };
     } catch (error) {
       this.logger.debug(`Registering passien ${JSON.stringify(error)}`);

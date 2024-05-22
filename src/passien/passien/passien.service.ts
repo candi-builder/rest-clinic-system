@@ -107,6 +107,8 @@ export class PassienService {
         throw new HttpException('Pasien tidak ditemukan', HttpStatus.NOT_FOUND);
       }
 
+
+
       return {
         data: this.mapToPassienResponse(pasien),
         status_code: HttpStatus.OK,
