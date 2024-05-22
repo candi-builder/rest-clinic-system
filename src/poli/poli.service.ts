@@ -80,9 +80,15 @@ export class PoliService {
         },
       });
 
-      if (!existingUser && !existingPoli) {
-        throw new HttpException('user dan poli tidak ditemukan ', 404);
+      if (!existingUser) {
+        throw new HttpException('User Tidak Ditemukan', 404);
       }
+
+      if (!existingPoli) {
+        throw new HttpException('Poli Tidak Ditemukan', 404);
+      }
+
+      
 
       if (existingData.length > 0) {
         throw new HttpException(
