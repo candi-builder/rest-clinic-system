@@ -143,6 +143,16 @@ export class PoliService {
         },
       });
 
+      const nullPolis = await this.prismaService.poli.findMany();
+
+      if (nullPolis.length === 0) {
+        return {
+          status_code: 404,
+          message: 'Data tidak ditemukan',
+        };
+      }
+      
+
       const PoliResponse: PoliResponse[] = polis.map((user) => ({
         id: user.poli_id.toString(),
         poli_name: user.poli_name,
@@ -224,7 +234,10 @@ export class PoliService {
     }
   }
 
-  async getListMember(
+
+  
+
+ async getListMember(
     page: number,
     size: number,
     poli_id: bigint,
@@ -238,6 +251,21 @@ export class PoliService {
         },
       });
       const totalPages = Math.ceil(totalCount / size);
+
+      const nullData = await this.prismaService.tPoli.findMany({
+        where: {
+          poli: {
+            poli_id: poli_id,
+          },
+        },
+      });
+
+      if (nullData.length === 0) {
+        return {
+          status_code: 404,
+          message: 'Data tidak ditemukan',
+        };
+      }
 
       const result = await this.prismaService.tPoli.findMany({
         skip: (page - 1) * size,
