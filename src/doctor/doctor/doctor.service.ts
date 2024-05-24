@@ -3,7 +3,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { ValidationService } from 'src/common/validation.service';
 import { BaseResponse } from 'src/model/BaseResponse.model';
-import { DiagnosaRequest, DoctorRequest, DoctorResponse } from 'src/model/doctor.model';
+import { DiagnosaRequest, DoctorResponse } from 'src/model/doctor.model';
 import { DoctorValidation } from './doctor.validation';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
@@ -18,15 +18,14 @@ export class DoctorService {
   ) {
   }
 
-  async updatePasienStatus(passienId: number, request: DoctorRequest): Promise<BaseResponse<DoctorResponse>> {
+  async updatePasienStatus(passienId: number ): Promise<BaseResponse<DoctorResponse>> {
+
+    let toNumberPassienId = Number(passienId);
     try {
 
-
-      const validateRequest = this.validationService.validate(DoctorValidation.UPDATE_PASIEN, request);
-
-      const antrianToUpdate = await this.prismaService.antrian.findFirst({
+      const antrianToUpdate = await this.prismaService.antrian.findUnique({
         where: {
-          passien_id: passienId,
+          id: toNumberPassienId,
         },
       });
 
@@ -39,14 +38,23 @@ export class DoctorService {
           id: antrianToUpdate.id,
         },
         data: {
-          status: validateRequest.status,
+          status: Status.CHECKING,
+        },
+      });
+
+      const checkStatusPasien = await this.prismaService.antrian.findUnique({
+        where: {
+          id: antrianToUpdate.id,
+        },
+        select: {
+          status: true,
         },
       });
 
       return {
         data: {
           pasien_id: passienId,
-          status: request.status,
+          status: checkStatusPasien.status,
         },
         status_code: 200,
         message: 'Status pasien berhasil diupdate',

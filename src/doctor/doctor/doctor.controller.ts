@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
 import { DoctorService } from './doctor.service';
-import { DiagnosaRequest, DoctorRequest } from 'src/model/doctor.model';
+import { DiagnosaRequest } from 'src/model/doctor.model';
 
 @Controller('doctor')
 export class DoctorController {
@@ -9,8 +9,8 @@ export class DoctorController {
 
     @Post('/update-pasien/:id')
     @HttpCode(200)
-    async updateStatusPasien(@Param() params: {passienId:number}, @Body() request: DoctorRequest) {
-        return await this.doctorService.updatePasienStatus(params.passienId,request);
+    async updatePatientStatus(@Param('id') passienId: number) {
+        return await this.doctorService.updatePasienStatus(passienId);
     }
 
     

@@ -1,8 +1,6 @@
 import { Status } from "@prisma/client";
 
-export class DoctorRequest {
-    status?: Status;
-}
+
 
 
 export class DoctorResponse {
