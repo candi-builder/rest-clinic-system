@@ -3,12 +3,17 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
 import { UserResponse } from 'src/model/UserManagement.model';
-import { ZodError } from 'zod';
+import { ZodError, any } from 'zod';
 import { fromZodError } from 'zod-validation-error';
+import { UserManagementRequest, UserManagementResponse } from './user-management.model';
+import * as bcrypt from 'bcrypt';
+import { ValidationService } from 'src/common/validation.service';
+import { UserManagementValidation } from './user-management.validation';
 
 @Injectable()
 export class UserManagementService {
   constructor(private prismaService: PrismaService,
+    private validationService: ValidationService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
     ) {}
 
@@ -142,4 +147,62 @@ export class UserManagementService {
       };
     }
   }
+
+  async changePassword(uuid: string, request: UserManagementRequest): Promise<BaseResponse<UserManagementResponse>> {
+    console.log(uuid);
+    try {
+      const changePasswordRequest = this.validationService.validate(UserManagementValidation.CHANGE_PASSWORD, request);
+      console.log(changePasswordRequest.password);
+
+      const checkPasien = await this.prismaService.user.findUnique({
+        where: {
+          uuid: uuid,
+        },
+      });
+
+      if (!checkPasien) {
+        return {
+          status_code: HttpStatus.NOT_FOUND,
+          message: 'User Tidak Ditemukan',
+        };
+      }
+
+      
+
+
+      await this.prismaService.user.update({
+        where: {
+          uuid: uuid,
+        },
+        data: {
+          password: await bcrypt.hash(changePasswordRequest.password, 10),
+        },
+      });
+
+      return{
+        data: {
+          username: checkPasien.username,
+          role: checkPasien.roles,
+        },
+        status_code: 200,
+        message: 'Password Berhasil Diubah',
+      };
+
+      
+    } catch (error) {
+      this.logger.debug(`Registering passien ${JSON.stringify(error)}`);
+
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+
+        return {
+          message: validationError.message,
+          status_code: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+        throw error;
+      }
+    }
+  }
+   
 }
