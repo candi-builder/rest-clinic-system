@@ -19,7 +19,6 @@ export class DoctorService {
   }
 
   async updatePasienStatus(passienId: number ): Promise<BaseResponse<DoctorResponse>> {
-
     let toNumberPassienId = Number(passienId);
     try {
 
