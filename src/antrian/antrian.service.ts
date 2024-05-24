@@ -289,11 +289,28 @@ export class AntrianService {
           status_code: 400,
           message: 'Status tidak valid and should be Uppercase, Status Available: WAITING, CHECKING, PICKUP, DONE',
         };
-     
       };
+
+      await this.prismaService.antrian.update({
+        where: {
+          id: antrianToUpdate.id,
+        },
+        data: {
+          status,
+        },
+      });
+
+      let checkStatusPasien = await this.prismaService.antrian.findUnique({
+        where: {
+          id: antrianToUpdate.id,
+        },
+        select: {
+          status: true,
+        },
+      });
       return {
         status_code: 201,
-        message: `Berhasil Mengubah status ke ${status}`,
+        message: `Berhasil Mengubah status ke ${checkStatusPasien.status}`,
       };
     } catch (error) {
       this.logger.debug(`Registering passien ${JSON.stringify(error)}`);
