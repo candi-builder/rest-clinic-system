@@ -14,10 +14,13 @@ export class DoctorController {
     }
 
     
-    @Post('/diagnosa')
+    @Post('/diagnosa/:id')
     @HttpCode(200)
-    async diagnosaPasien(@Body() request: DiagnosaRequest) {
-        return await this.doctorService.createDiagnosa(request);
+    async diagnosaPasien(
+        @Param('id') passienId: number,
+        @Body() request: DiagnosaRequest
+        ) {
+        return await this.doctorService.createDiagnosa(passienId,request);
     }
 
 
