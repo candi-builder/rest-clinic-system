@@ -77,16 +77,16 @@ export class DoctorService {
   }
 
 
-  async createDiagnosa(request: DiagnosaRequest): Promise<BaseResponse<DiagnosaRequest>> {
+  async createDiagnosa(pasienId: number, request: DiagnosaRequest): Promise<BaseResponse<DiagnosaRequest>> {
     try {
       const validateRequest = this.validationService.validate(DoctorValidation.DIAGNOSA, request);
       const checkPasien = await this.prismaService.antrian.findFirst({
-        where: { passien_id: validateRequest.pasien_id },
+        where: { passien_id: Number(pasienId) },
         select: { status: true },
       });
   
-      const doctorName = await this.prismaService.pasien.findFirst({
-        where: { pasien_id: request.pasien_id },
+      const doctorName = await this.prismaService.pasien.findUnique({
+        where: { pasien_id : Number(pasienId )},
         include: {
           poli: {
             include: {
@@ -102,7 +102,7 @@ export class DoctorService {
       }
   
       const existingDiagnosa = await this.prismaService.resep.findFirst({
-        where: { pasien_id: validateRequest.pasien_id },
+        where: { pasien_id: Number(pasienId) },
       });
   
       if (existingDiagnosa) {
@@ -114,7 +114,7 @@ export class DoctorService {
         const diagnosa = await prisma.resep.create({
           data: {
             tanggal_resep: new Date(),
-            pasien_id: validateRequest.pasien_id,
+            pasien_id: Number(pasienId),
             keterangan_resep: validateRequest.keterangan_resep,
             hasil_diagnosa: validateRequest.hasil_diagnosa,
           },
@@ -124,8 +124,8 @@ export class DoctorService {
 
         
         const updatePasien = await prisma.antrian.update({
-          where: { id: validateRequest.pasien_id },
-          data: { status: validateRequest.status },
+          where: { id:Number(pasienId)  },
+          data: { status: Status.PICKUP },
         });
         
 

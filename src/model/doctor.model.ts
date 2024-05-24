@@ -9,10 +9,10 @@ export class DoctorResponse {
 }
 
 export class DiagnosaRequest{
-    pasien_id: number;
+    
     keterangan_resep: string;
     hasil_diagnosa: string;
-    status: Status;
+    
     doctor?: string;
     
     
