@@ -13,6 +13,7 @@ import { ValidationService } from 'src/common/validation.service';
 import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class PassienService {
@@ -26,33 +27,32 @@ export class PassienService {
     request: PassienRequest,
   ): Promise<BaseResponse<PassienResponse>> {
     this.logger.debug(`Registering passien ${JSON.stringify(request)}`);
-    
+
     try {
-    const registerPassienRequest = this.validationService.validate(
-      PassienValidation.REGISTER_PASSIEN,
-      request,
-    );
-
-    const existingPassien = await this.prismaService.pasien.findFirst({
-      where: { nomor_bpjs: registerPassienRequest.nomor_bpjs },
-    });
-
-    if (existingPassien) {
-      throw new HttpException(
-        'Nomor BPJS sudah terdaftar',
-        HttpStatus.BAD_REQUEST,
+      const registerPassienRequest = this.validationService.validate(
+        PassienValidation.REGISTER_PASSIEN,
+        request,
       );
-    }
-    
-    const checkPoli = await this.prismaService.tPoli.findFirst({
-      where: { id: registerPassienRequest.poli_id },
-    });
 
-    if (!checkPoli) {
-      throw new HttpException('Poli tidak ditemukan', HttpStatus.BAD_REQUEST);
-    }
+      const existingPassien = await this.prismaService.pasien.findFirst({
+        where: { nomor_bpjs: registerPassienRequest.nomor_bpjs },
+      });
 
-    
+      if (existingPassien) {
+        throw new HttpException(
+          'Nomor BPJS sudah terdaftar',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const checkPoli = await this.prismaService.tPoli.findFirst({
+        where: { id: registerPassienRequest.poli_id },
+      });
+
+      if (!checkPoli) {
+        throw new HttpException('Poli tidak ditemukan', HttpStatus.BAD_REQUEST);
+      }
+
       const passien = await this.prismaService.pasien.create({
         data: {
           ...registerPassienRequest,
@@ -106,8 +106,6 @@ export class PassienService {
       if (!pasien) {
         throw new HttpException('Pasien tidak ditemukan', HttpStatus.NOT_FOUND);
       }
-
-
 
       return {
         data: this.mapToPassienResponse(pasien),
@@ -213,5 +211,53 @@ export class PassienService {
       dokter: pasien.poli.TPoli[0]?.user.full_name,
       status: antrianPassien ? antrianPassien.status : 'Tidak ada antrian',
     };
+  }
+
+  async deletePassienById(id: number): Promise<BaseResponse<string>> {
+    try {
+      const checkPassien = await this.prismaService.pasien.findUnique({
+        where: { pasien_id: id },
+      });
+
+      const checkAntrian = await this.prismaService.antrian.findFirst({
+        where: { passien_id: id },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!checkPassien && !checkAntrian) {
+        throw new HttpException('Pasien tidak ditemukan', HttpStatus.NOT_FOUND);
+      }
+
+      await this.prismaService.$transaction(async (prisma) => {
+        await prisma.antrian.delete({
+          where: { id: checkAntrian.id },
+        });
+
+        await prisma.pasien.delete({
+          where: { pasien_id: checkPassien.pasien_id },
+        });
+      });
+
+      return {
+        status_code: HttpStatus.OK,
+        message: `Success delete pasien ${checkPassien.nama_passien} with id ${checkPassien.pasien_id}`,
+        
+      };
+    } catch (error) {
+      this.logger.debug(`Delete passien by id ${JSON.stringify(error)}`);
+
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+
+        return {
+          message: validationError.message,
+          status_code: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+        throw error;
+      }
+    }
   }
 }

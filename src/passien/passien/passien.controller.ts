@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -53,6 +54,15 @@ export class PassienController {
     const passien = await this.passienService.getListPassienByPoliId(page, size, poliId);
     return passien;
   }
+
+  @Delete(':passienId')
+  @HttpCode(200)
+  async deletePassienById(@Param ('passienId') passienId: number): Promise<BaseResponse<string>> {
+    const passien = await this.passienService.deletePassienById(passienId);
+    return passien;
+  }
+
+
 
   
 }
