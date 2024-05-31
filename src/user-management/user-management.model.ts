@@ -3,8 +3,6 @@ export class UserManagementRequest{
 }
 
 export class UserManagementResponse{
-    
     username: string;
     role: string;
-    
 }
