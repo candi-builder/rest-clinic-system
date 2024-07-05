@@ -35,6 +35,11 @@ export class UserManagementService {
         full_name: true,
         roles: true,
       },
+      where: {
+        roles:{
+          not: "SUPERADMIN"
+        }
+      }
     });
 
     const userResponses: UserResponse[] = users.map((user) => ({
