@@ -9,7 +9,7 @@ export class PassienValidation{
         nik: z.string().min(16).max(16).optional(),
         nama_passien: z.string().min(3).max(255),
         tanggal_lahir: z.string(),
-        alamat: z.string().min(3).max(255),
+        alamat: z.string().optional(),
         kelas_rawat: z.string().optional(),
         faskes_tingkat_satu: z.string().min(3).max(255),
         poli_id: z.number(),
