@@ -1,18 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AntrianService } from './antrian.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { AntrianService } from "./antrian.service";
 
-describe('AntrianService', () => {
-  let service: AntrianService;
+describe("AntrianService", () => {
+	let service: AntrianService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AntrianService],
-    }).compile();
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			providers: [AntrianService],
+		}).compile();
 
-    service = module.get<AntrianService>(AntrianService);
-  });
+		service = module.get<AntrianService>(AntrianService);
+	});
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+	it("should be defined", () => {
+		expect(service).toBeDefined();
+	});
 });

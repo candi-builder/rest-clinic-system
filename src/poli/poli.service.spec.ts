@@ -1,18 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PoliService } from './poli.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { PoliService } from "./poli.service";
 
-describe('PoliService', () => {
-  let service: PoliService;
+describe("PoliService", () => {
+	let service: PoliService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [PoliService],
-    }).compile();
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			providers: [PoliService],
+		}).compile();
 
-    service = module.get<PoliService>(PoliService);
-  });
+		service = module.get<PoliService>(PoliService);
+	});
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+	it("should be defined", () => {
+		expect(service).toBeDefined();
+	});
 });

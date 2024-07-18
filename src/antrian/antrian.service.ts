@@ -1,330 +1,330 @@
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { Status } from '@prisma/client';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { PrismaService } from 'src/common/prisma.service';
-import { BaseResponse, PaginationData } from 'src/model/BaseResponse.model';
-import { AntrianResponse } from 'src/model/antrian.model';
-import { Utils } from 'src/utils/utils';
-import { ZodError } from 'zod';
-import { fromZodError } from 'zod-validation-error';
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
+import { Status } from "@prisma/client";
+import { WINSTON_MODULE_PROVIDER } from "nest-winston";
+import { PrismaService } from "src/common/prisma.service";
+import { BaseResponse, PaginationData } from "src/model/BaseResponse.model";
+import { AntrianResponse } from "src/model/antrian.model";
+import { Utils } from "src/utils/utils";
+import { ZodError } from "zod";
+import { fromZodError } from "zod-validation-error";
 
 @Injectable()
 export class AntrianService {
-  constructor(
-    private prismaService: PrismaService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-  ) {}
+	constructor(
+		private prismaService: PrismaService,
+		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+	) {}
 
-  async getAntrianDocter(
-    page: number,
-    size: number = 10,
-    doctor: string,
-  ): Promise<BaseResponse<AntrianResponse[]>> {
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const totalCount = await this.prismaService.antrian.count({
-        where: {
-          AND: [
-            {
-              poli: {
-                user_id: doctor,
-              },
-            },
-            {
-              tanggal: {
-                gte: today,
-                lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-              },
-            },
-            {
-              OR: [
-                {
-                  status: 'WAITING',
-                },
-                {
-                  status: 'CHECKING',
-                },
-              ],
-            }
-          ]
-        }
-      });
-      const totalPages = Math.ceil(totalCount / size);
-      
-      const data = await this.prismaService.antrian.findMany({
-        skip: (page - 1) * size,
-        take: size,
-        where: {
-          AND: [
-            {
-              poli: {
-                user_id: doctor,
-              },
-            },
-            {
-              tanggal: {
-                gte: today,
-                lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-              },
-            },
-            {
-              OR: [
-                {
-                  status: 'WAITING',
-                },
-                {
-                  status: 'CHECKING',
-                },
-              ],
-            }
-          ]
-        },
-        select: {
-          passien: {
-            select: {
-              pasien_id:true,
-              nomor_bpjs: true,
-              nama_passien: true,
-            },
-          },
-          poli: {
-            select: {
-              user: {
-                select: {
-                  username: true,
-                },
-              },
-              poli: {
-                select: {
-                  poli_name: true,
-                },
-              },
-            },
-          },
-          id:true,
-          status: true,
-          tanggal: true,
-        },
-      });
-      
-      if(data.length === 0){
-        return {
-          status_code: HttpStatus.NOT_FOUND,
-          message: 'Data tidak ditemukan',
-        };
-      }
-      
-      const paginationData: PaginationData = {
-        page,
-        size,
-        total_page: totalPages,
-        total_data: totalCount,
-      };
-      const AntrianResponse: AntrianResponse[] = data.map((antrian) => ({
-        id: antrian.id,
-        passien_id:antrian.passien.pasien_id.toString(),
-        nomor_bpjs: antrian.passien.nomor_bpjs,
-        nama_passien: antrian.passien.nama_passien,
-        dokter: antrian.poli.user.username,
-        poli: antrian.poli.poli.poli_name,
-        status: antrian.status,
-      }));
+	async getAntrianDocter(
+		page: number,
+		size: number = 10,
+		doctor: string,
+	): Promise<BaseResponse<AntrianResponse[]>> {
+		try {
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			const totalCount = await this.prismaService.antrian.count({
+				where: {
+					AND: [
+						{
+							poli: {
+								user_id: doctor,
+							},
+						},
+						{
+							tanggal: {
+								gte: today,
+								lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+							},
+						},
+						{
+							OR: [
+								{
+									status: "WAITING",
+								},
+								{
+									status: "CHECKING",
+								},
+							],
+						},
+					],
+				},
+			});
+			const totalPages = Math.ceil(totalCount / size);
 
-      return {
-        data: AntrianResponse,
-        pagination: paginationData,
-        status_code: 200,
-        message: 'success',
-      };
-    } catch (error) {
-      this.logger.debug(`get antrian docter ${JSON.stringify(error)}`);
+			const data = await this.prismaService.antrian.findMany({
+				skip: (page - 1) * size,
+				take: size,
+				where: {
+					AND: [
+						{
+							poli: {
+								user_id: doctor,
+							},
+						},
+						{
+							tanggal: {
+								gte: today,
+								lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+							},
+						},
+						{
+							OR: [
+								{
+									status: "WAITING",
+								},
+								{
+									status: "CHECKING",
+								},
+							],
+						},
+					],
+				},
+				select: {
+					passien: {
+						select: {
+							pasien_id: true,
+							nomor_bpjs: true,
+							nama_passien: true,
+						},
+					},
+					poli: {
+						select: {
+							user: {
+								select: {
+									username: true,
+								},
+							},
+							poli: {
+								select: {
+									poli_name: true,
+								},
+							},
+						},
+					},
+					id: true,
+					status: true,
+					tanggal: true,
+				},
+			});
 
-      if (error instanceof ZodError) {
-        const validationError = fromZodError(error);
+			if (data.length === 0) {
+				return {
+					status_code: HttpStatus.NOT_FOUND,
+					message: "Data tidak ditemukan",
+				};
+			}
 
-        return {
-          message: validationError.message,
-          status_code: HttpStatus.BAD_REQUEST,
-        };
-      } else {
-        throw error;
-      }
-    }
-  }
+			const paginationData: PaginationData = {
+				page,
+				size,
+				total_page: totalPages,
+				total_data: totalCount,
+			};
+			const AntrianResponse: AntrianResponse[] = data.map((antrian) => ({
+				id: antrian.id,
+				passien_id: antrian.passien.pasien_id.toString(),
+				nomor_bpjs: antrian.passien.nomor_bpjs,
+				nama_passien: antrian.passien.nama_passien,
+				dokter: antrian.poli.user.username,
+				poli: antrian.poli.poli.poli_name,
+				status: antrian.status,
+			}));
 
-  async getAntrianPickup(
-    page: number,
-    size: number = 10,
-  ): Promise<BaseResponse<AntrianResponse[]>> {
-    try {
-      const totalCount = await this.prismaService.antrian.count();
-      const totalPages = Math.ceil(totalCount / size);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const data = await this.prismaService.resep.findMany({
-        skip: (page - 1) * size,
-        take: size,
-        select: {
-          hasil_diagnosa: true,
-          keterangan_resep: true,
-          tanggal_resep: true,
-          pasien: {
-            select: {
-              pasien_id:true,
-              nomor_bpjs: true,
-              nama_passien: true,
-              Antrian: {
-                where: {
-                  tanggal: {
-                    gte: today,
-                    lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-                  },
-                  status: 'PICKUP',
-                },
-                select: {
-                  poli: {
-                    select: {
-                      user: {
-                        select: {
-                          username: true,
-                        },
-                      },
-                      poli: {
-                        select: {
-                          poli_name: true,
-                        },
-                      },
-                    },
-                  },
-                  id:true,
-                  status: true,
-                  tanggal: true,
-                },
-              },
-            },
-          },
-        },
-      });
+			return {
+				data: AntrianResponse,
+				pagination: paginationData,
+				status_code: 200,
+				message: "success",
+			};
+		} catch (error) {
+			this.logger.debug(`get antrian docter ${JSON.stringify(error)}`);
 
-      if(data.length === 0){
-        return {
-          status_code: HttpStatus.NOT_FOUND,
-          message: 'Data tidak ditemukan',
-        };
-      }
-      const paginationData: PaginationData = {
-        page,
-        size,
-        total_page: totalPages,
-        total_data: totalCount,
-      };
-      const antrianResponses: AntrianResponse[] = [];
+			if (error instanceof ZodError) {
+				const validationError = fromZodError(error);
 
-      data.forEach((resep) => {
-        resep.pasien.Antrian.forEach((antrian) => {
-          const response: AntrianResponse = {
-            id: antrian.id,
-            passien_id:resep.pasien.pasien_id.toString(),
-            nomor_bpjs: resep.pasien.nomor_bpjs,
-            nama_passien: resep.pasien.nama_passien,
-            dokter: antrian.poli.user.username,
-            poli: antrian.poli.poli.poli_name,
-            status: antrian.status,
-            hasil_diagnosa: resep.hasil_diagnosa,
-            keterangan_resep: resep.keterangan_resep,
-          };
+				return {
+					message: validationError.message,
+					status_code: HttpStatus.BAD_REQUEST,
+				};
+			} else {
+				throw error;
+			}
+		}
+	}
 
-          antrianResponses.push(response);
-        });
-      });
+	async getAntrianPickup(
+		page: number,
+		size: number = 10,
+	): Promise<BaseResponse<AntrianResponse[]>> {
+		try {
+			const totalCount = await this.prismaService.antrian.count();
+			const totalPages = Math.ceil(totalCount / size);
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			const data = await this.prismaService.resep.findMany({
+				skip: (page - 1) * size,
+				take: size,
+				select: {
+					hasil_diagnosa: true,
+					keterangan_resep: true,
+					tanggal_resep: true,
+					pasien: {
+						select: {
+							pasien_id: true,
+							nomor_bpjs: true,
+							nama_passien: true,
+							Antrian: {
+								where: {
+									tanggal: {
+										gte: today,
+										lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+									},
+									status: "PICKUP",
+								},
+								select: {
+									poli: {
+										select: {
+											user: {
+												select: {
+													username: true,
+												},
+											},
+											poli: {
+												select: {
+													poli_name: true,
+												},
+											},
+										},
+									},
+									id: true,
+									status: true,
+									tanggal: true,
+								},
+							},
+						},
+					},
+				},
+			});
 
-      return {
-        data: antrianResponses,
-        pagination: paginationData,
-        status_code: 200,
-        message: 'success',
-      };
-    } catch (error) {
-      this.logger.debug(`get antrian pickup ${JSON.stringify(error)}`);
+			if (data.length === 0) {
+				return {
+					status_code: HttpStatus.NOT_FOUND,
+					message: "Data tidak ditemukan",
+				};
+			}
+			const paginationData: PaginationData = {
+				page,
+				size,
+				total_page: totalPages,
+				total_data: totalCount,
+			};
+			const antrianResponses: AntrianResponse[] = [];
 
-      if (error instanceof ZodError) {
-        const validationError = fromZodError(error);
+			data.forEach((resep) => {
+				resep.pasien.Antrian.forEach((antrian) => {
+					const response: AntrianResponse = {
+						id: antrian.id,
+						passien_id: resep.pasien.pasien_id.toString(),
+						nomor_bpjs: resep.pasien.nomor_bpjs,
+						nama_passien: resep.pasien.nama_passien,
+						dokter: antrian.poli.user.username,
+						poli: antrian.poli.poli.poli_name,
+						status: antrian.status,
+						hasil_diagnosa: resep.hasil_diagnosa,
+						keterangan_resep: resep.keterangan_resep,
+					};
 
-        return {
-          message: validationError.message,
-          status_code: HttpStatus.BAD_REQUEST,
-        };
-      } else {
-        throw error;
-      }
-    }
-  }
+					antrianResponses.push(response);
+				});
+			});
 
-  async updateStatus(
-    antrianId: number,
-    status: Status,
-  ): Promise<BaseResponse<string>> {
-    try {
-      const antrianToUpdate = await this.prismaService.antrian.findUnique({
-        where: {
-          id: Number(antrianId),
-        },
-      });
-      if (!antrianToUpdate) {
-        return {
-          status_code: 404,
-          message: 'antrian tidak ditemukan',
-        };
-      }
-      
+			return {
+				data: antrianResponses,
+				pagination: paginationData,
+				status_code: 200,
+				message: "success",
+			};
+		} catch (error) {
+			this.logger.debug(`get antrian pickup ${JSON.stringify(error)}`);
 
-      if(
-        status !== 'WAITING' &&
-        status !== 'CHECKING' &&
-        status !== 'PICKUP' &&
-        status !== 'DONE'
-      ){
-        return {
-          status_code: 400,
-          message: 'Status tidak valid and should be Uppercase, Status Available: WAITING, CHECKING, PICKUP, DONE',
-        };
-      };
+			if (error instanceof ZodError) {
+				const validationError = fromZodError(error);
 
-      await this.prismaService.antrian.update({
-        where: {
-          id: antrianToUpdate.id,
-        },
-        data: {
-          status,
-        },
-      });
+				return {
+					message: validationError.message,
+					status_code: HttpStatus.BAD_REQUEST,
+				};
+			} else {
+				throw error;
+			}
+		}
+	}
 
-      let checkStatusPasien = await this.prismaService.antrian.findUnique({
-        where: {
-          id: antrianToUpdate.id,
-        },
-        select: {
-          status: true,
-        },
-      });
-      return {
-        status_code: 201,
-        message: `Berhasil Mengubah status ke ${checkStatusPasien.status}`,
-      };
-    } catch (error) {
-      this.logger.debug(`Registering passien ${JSON.stringify(error)}`);
+	async updateStatus(
+		antrianId: number,
+		status: Status,
+	): Promise<BaseResponse<string>> {
+		try {
+			const antrianToUpdate = await this.prismaService.antrian.findUnique({
+				where: {
+					id: Number(antrianId),
+				},
+			});
+			if (!antrianToUpdate) {
+				return {
+					status_code: 404,
+					message: "antrian tidak ditemukan",
+				};
+			}
 
-      if (error instanceof ZodError) {
-        const validationError = fromZodError(error);
+			if (
+				status !== "WAITING" &&
+				status !== "CHECKING" &&
+				status !== "PICKUP" &&
+				status !== "DONE"
+			) {
+				return {
+					status_code: 400,
+					message:
+						"Status tidak valid and should be Uppercase, Status Available: WAITING, CHECKING, PICKUP, DONE",
+				};
+			}
 
-        return {
-          message: validationError.message,
-          status_code: HttpStatus.BAD_REQUEST,
-        };
-      } else {
-        throw error;
-      }
-    }
-  }
+			await this.prismaService.antrian.update({
+				where: {
+					id: antrianToUpdate.id,
+				},
+				data: {
+					status,
+				},
+			});
+
+			let checkStatusPasien = await this.prismaService.antrian.findUnique({
+				where: {
+					id: antrianToUpdate.id,
+				},
+				select: {
+					status: true,
+				},
+			});
+			return {
+				status_code: 201,
+				message: `Berhasil Mengubah status ke ${checkStatusPasien.status}`,
+			};
+		} catch (error) {
+			this.logger.debug(`Registering passien ${JSON.stringify(error)}`);
+
+			if (error instanceof ZodError) {
+				const validationError = fromZodError(error);
+
+				return {
+					message: validationError.message,
+					status_code: HttpStatus.BAD_REQUEST,
+				};
+			} else {
+				throw error;
+			}
+		}
+	}
 }

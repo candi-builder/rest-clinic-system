@@ -3,17 +3,20 @@ import {
 	HttpStatus,
 	Inject,
 	Injectable,
-	Logger,
+	type Logger,
 } from "@nestjs/common";
+import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
-import { PrismaService } from "src/common/prisma.service";
-import { PassienRequest, PassienResponse } from "src/model/passien.model";
-import { PassienValidation } from "./passien.validation";
-import { ValidationService } from "src/common/validation.service";
-import { BaseResponse, PaginationData } from "src/model/BaseResponse.model";
+import type { PrismaService } from "src/common/prisma.service";
+import type { ValidationService } from "src/common/validation.service";
+import type {
+	BaseResponse,
+	PaginationData,
+} from "src/model/BaseResponse.model";
+import type { PassienRequest, PassienResponse } from "src/model/passien.model";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
+import { PassienValidation } from "./passien.validation";
 
 @Injectable()
 export class PassienService {
